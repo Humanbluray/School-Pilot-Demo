@@ -1032,6 +1032,7 @@ class Years(ft.Container):
             # 1- on calcule les moyennes...
             students = await get_all_registered_students_by_year(access_token, year_id)
             count_student = 0
+            class_statistics_list = []
 
             # 2- on itère sur chaque élève inscrit...
             for student in students:
@@ -1042,12 +1043,13 @@ class Years(ft.Container):
                 total_points: float = 0
                 moyenne: float = 0
 
+                print("Résultats des élèves___________________________________________")
                 # on calcule le total coefficient et le total points pour chaque élève...
                 for item in notes:
                     total_coefficients += item['coefficient']
                     total_points += item['coefficient'] * item['value']
 
-                moyenne = total_points / total_coefficients
+                    moyenne = total_points / total_coefficients
 
                 #données à insérer dans la table sequence_averages
                 datas_to_insert = {
@@ -1060,7 +1062,7 @@ class Years(ft.Container):
                     "points": total_points,
                     "total_coefficient": total_coefficients
                 }
-
+                print(f"{datas_to_insert}")
 
                 # insertion des données dans la table sequence_averages
                 await insert_sequence_average(
@@ -1080,6 +1082,7 @@ class Years(ft.Container):
 
                 self.cp.page.update()
 
+            print("fin des résultats des élèves_______________________________________________")
             # 3- on ressort toutes les classes
             all_class_info = await get_all_classes_basic_info(access_token)
 
@@ -1090,11 +1093,12 @@ class Years(ft.Container):
             all_classes = [row['class_id'] for row in all_moyennes]
             all_class_info = list(set(all_classes))
 
-            count_class_stats = 0
+            print("Statistiques des classes________________________________________________________")
             # on itère sur chaque classe tout en itérant sur chaque moyenne d'élèves pour faire des calculs...
-            for item in enumerate(all_class_info):
+            for item in all_class_info:
                 list_values = []  # liste des moyennes qui sera utile pour le min et max
                 nb_sup_10 = 0  # total des moyennes > 10...
+                count_class_stats = 0
 
                 for element in all_moyennes: # on itère sur chaque classe...
                     if item == element['class_id']:
@@ -1111,7 +1115,7 @@ class Years(ft.Container):
                         'min_average': min(list_values), 'max_average': max(list_values),
                         'nb_success': nb_sup_10, 'success_rate': nb_sup_10 * 100 / len(list_values)
                     }
-
+                    print(class_avg_data_to_insert)
                     # on insère les données dans la table classes_statistics...
                     await insert_class_average(
                         access_token, class_avg_data_to_insert
@@ -1132,12 +1136,7 @@ class Years(ft.Container):
             self.close_sequence_normally()
 
         self.cp.page.update()
-        try:
-            supabase_client.auth.sign_out()
-        except Exception as e:
-            print(f"Erreur lors de la déconnexion : {e}")
-        self.page.client_storage.clear()
-        self.page.go('/')
+
 
     def open_new_year_infos_window(self, e):
         self.run_async_in_thread(self.load_new_year_infos(e))
