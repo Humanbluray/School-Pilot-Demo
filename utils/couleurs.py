@@ -1,0 +1,24 @@
+import flet as ft
+
+# START_COLOR = '#1E3A8A'
+# END_COLOR = '#3d518a'
+# CT_BGCOLOR = "#f9fafb"
+# CT_BORDER_COLOR = '#e2e8f0'
+
+MENU_BG_COLOR = '#0a035e'
+MENU_SELECTED_COLOR = '#4f3ce8'
+
+MAIN_COLOR = 'amber'
+SECOND_COLOR = 'amber50'
+THIRD_COLOR = 'white'
+FOURTH_COLOR = '#335939'
+
+
+START_COLOR = '#1E3A8A'
+END_COLOR = '#3d518a'
+CT_BGCOLOR = "#f0f0f6"
+CT_BORDER_COLOR = '#e2e8f0'
+
+BASE_COLOR = 'amber'
+
+EMERALD_GREEN = '#30663f'
