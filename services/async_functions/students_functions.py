@@ -171,30 +171,33 @@ async def get_active_classes(access_token: str) -> list[dict]:
         return data
 
 
-async def get_fee_amount_by_part_and_year(part: str, access_token: str) -> float | None:
-    year_id = await get_active_year_id(access_token)
-    if not year_id:
-        return None
+async def get_fees_amount_by_year(access_token: str, year_id: str) -> Dict:
+    """
 
+    :param access_token:
+    :param year_id:
+    :return:
+    """
+    query_url = f"{url}/rest/v1/vw_fees_by_type_pivot"
+    params={
+        "select": "*",
+        "year_id": f"eq.{year_id}",
+    }
+    headers={
+        "apikey": key,
+        "Authorization": f"Bearer {access_token}"
+    }
     async with httpx.AsyncClient() as client:
         response = await client.get(
-            f"{url}/rest/v1/fees_part",
-            params={
-                "select": "amount",
-                "part": f"eq.{part}",
-                "year_id": f"eq.{year_id}",
-                "limit": 1
-            },
-            headers={
-                "apikey": key,
-                "Authorization": f"Bearer {access_token}"
-            }
+            query_url,
+            params=params,
+            headers=headers
         )
         response.raise_for_status()
         data = response.json()
 
         if data:
-            return data[0].get("amount")
+            return data[0]
         return None
 
 
@@ -268,11 +271,14 @@ async def get_total_registered_students_async(access_token: str) -> int:
         return len(data)
 
 
-async def get_student_payments_for_active_year(access_token: str, student_id: str) -> List[dict]:
-    year_id = await get_active_year_id(access_token)
-    if not year_id:
-        return []
+async def get_student_payments_for_active_year(access_token: str, student_id: str, year_id: str) -> List[dict]:
+    """
 
+    :param access_token:
+    :param student_id:
+    :param year_id:
+    :return:
+    """
     async with httpx.AsyncClient() as client:
         res = await client.get(
             f"{url}/rest/v1/school_fees",

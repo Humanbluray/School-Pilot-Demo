@@ -6,9 +6,10 @@ from services.supabase_client import supabase_client
 import asyncio
 from services.async_functions.students_functions import get_current_year_id, get_current_year_label, get_current_year_short
 from services.async_functions.general_functions import get_active_quarter, get_active_sequence
+from utils.styles import cool_style
 
 user_infos_is_active = False
-menu_is_active = False
+menu_data_is_active = False
 
 
 class Home(ft.View):
@@ -27,13 +28,23 @@ class Home(ft.View):
         self.year_short = get_current_year_short()
 
         # On prépare aussi les éléments à l'avance (pour éviter les erreurs plus tard)
-        self.user_account = ft.Text(size=13, font_family='PPM')
-        self.user_role = ft.Text(size=13, font_family='PPM')
-        self.user_function = ft.Text(size=13, font_family='PPM')
-        self.user_email = ft.Text(size=13, font_family='PPM')
-        self.user_contact = ft.Text(size=13, font_family='PPM')
-        self.user_name = ft.Text(size=16, font_family='PSB')
-        self.user_surname = ft.Text(size=12, font_family='PPM', color='grey')
+        self.user_account = ft.TextField(
+            **cool_style, disabled=True, expand=True, prefix_icon=ft.Icons.ASSURED_WORKLOAD_OUTLINED
+        )
+        self.user_role = ft.TextField(
+            **cool_style, disabled=True, expand=True, prefix_icon=ft.Icons.ADMIN_PANEL_SETTINGS_OUTLINED
+        )
+        self.user_function = ft.TextField(
+            **cool_style, disabled=True, expand=True, prefix_icon=ft.Icons.ASSIGNMENT_IND_OUTLINED
+        )
+        self.user_email = ft.TextField(
+            **cool_style, disabled=True, expand=True, prefix_icon=ft.Icons.EMAIL_OUTLINED
+        )
+        self.user_contact = ft.TextField(
+            **cool_style, disabled=True, expand=True, prefix_icon=ft.Icons.PHONE_IPHONE
+        )
+        self.user_name = ft.Text(size=18, font_family='PSB')
+        self.user_surname = ft.Text(size=14, font_family='PPM', color='grey')
         self.user_picture = ft.CircleAvatar(radius=20)
 
         self.current_year = get_current_year_id()
@@ -48,69 +59,51 @@ class Home(ft.View):
         self.current_year_label = get_current_year_label()
 
         self.left_menu = ft.Container(
-            content=NavBar(self), width=200,  # border=ft.border.only(right=ft.BorderSide(1, 'grey')),
+            content=NavBar(self), width=220,  # border=ft.border.only(right=ft.BorderSide(1, 'grey')),
             offset=ft.Offset(0, 0),
             animate_offset=ft.Animation(300, ft.AnimationCurve.EASE_IN)
         )
-        self.active_quarter = ft.Text(size=12, font_family="PPM")
-        self.active_sequence = ft.Text(size=12, font_family="PPM")
+        self.active_quarter = ft.Text(size=12, font_family="PPM", color="teal")
+        self.active_sequence = ft.Text(size=12, font_family="PPM", color="teal")
+
+        self.nb_notifications = ft.Text("2", size=10, font_family="PPB", color="white")
+        self.notifications_cloud = ft.Container(
+            visible=True, alignment=ft.alignment.center, shape=ft.BoxShape.CIRCLE, width=20,
+            content=self.nb_notifications, bgcolor='red', padding=3
+        )
+        self.notifs_container = ft.Stack(
+            controls=[
+                ft.Container(
+                    bgcolor='#f0f0f6', alignment=ft.alignment.center, shape=ft.BoxShape.CIRCLE,
+                    content=ft.Icon(ft.Icons.NOTIFICATIONS, color='black', size=20), height=45,
+                    padding=10,
+                    on_click=self.open_data_container
+                ),
+                self.notifications_cloud
+            ], alignment=ft.alignment.top_right
+        )
         self.top_menu = ft.Container(
             padding=ft.padding.only(20, 10, 20, 10), bgcolor='white',
             border=ft.border.only(bottom=ft.BorderSide(2, '#f0f0f6')),
             content=ft.Row(
                 controls=[
-                    ft.Text(''),
-                    ft.Row(
-                        controls=[
-                            ft.Container(
-                                border_radius=16, padding=10, bgcolor='#f0f0f6',
-                                # border=ft.border.all(1, 'amber'),
-                                content=ft.Row(
-                                    [
-                                        ft.Icon(ft.Icons.EDIT_CALENDAR_OUTLINED, color='black', size=20),
-                                        self.active_quarter
-                                    ], alignment=ft.MainAxisAlignment.CENTER, spacing=5,
-                                )
-                            ),
-                            ft.Container(
-                                border_radius=16, padding=10, bgcolor='#f0f0f6',
-#                                 border=ft.border.all(1, 'amber'),
-                                content=ft.Row(
-                                    [
-                                        ft.Icon(ft.Icons.CALENDAR_MONTH_ROUNDED, color='black', size=20),
-                                        self.active_sequence
-                                    ], alignment=ft.MainAxisAlignment.CENTER, spacing=5,
-                                )
-                            )
-                        ]
+                    self.notifs_container,
+                    ft.Container(
+                        bgcolor='#f0f0f6', alignment=ft.alignment.center, shape=ft.BoxShape.CIRCLE,
+                        content=ft.Icon(ft.Icons.CALENDAR_MONTH_ROUNDED, color='black', size=20), height=45,
+                        padding=10,
+                        on_click=self.open_data_container
                     ),
-                    ft.Row(
-                        controls=[
-                            ft.Container(
-                                bgcolor='#f0f0f6', alignment=ft.alignment.center, shape=ft.BoxShape.CIRCLE,
-                                content=ft.Icon(ft.Icons.NOTIFICATIONS, color='black54', size=20), height=40,
-                                padding=10,
-                                on_click=self.open_user_container
-                            ),
-                            ft.Container(
-                                bgcolor='#f0f0f6', alignment=ft.alignment.center, shape=ft.BoxShape.CIRCLE,
-                                content=ft.Icon(ft.Icons.WINDOW_ROUNDED, color='black54', size=20), height=40,
-                                padding=10,
-                                on_click=self.open_user_container
-                            ),
-                            ft.Container(content=self.user_picture, on_click=self.open_user_container)
-                        ]
-                    )
-                ],
-                alignment=ft.MainAxisAlignment.SPACE_BETWEEN
+                    ft.Container(content=self.user_picture, on_click=self.open_user_container)
+                ], alignment=ft.MainAxisAlignment.END
             )
         )
 
         self.user_container = ft.Card(
-            elevation=10, shape=ft.RoundedRectangleBorder(radius=10), right=10, top=60,
+            elevation=20, shape=ft.RoundedRectangleBorder(radius=10), right=5, top=60,
             scale=ft.Scale(0), animate_scale=ft.Animation(100, ft.AnimationCurve.BOUNCE_OUT),
             content=ft.Container(
-                bgcolor='white', padding=20, border_radius=10, width=280, expand=True,
+                bgcolor='white', padding=20, border_radius=10, width=320, expand=True,
                 content=ft.Column(
                     controls=[
                         ft.Container(
@@ -127,34 +120,86 @@ class Home(ft.View):
                             content=ft.ListView(
                                 controls=[
                                     ft.Column([
-                                        ft.Text(languages[self.language]['email'], size=12, font_family='PPI',
+                                        ft.Text(languages[self.language]['email'], size=12, font_family='PPM',
                                                 color='grey'),
                                         ft.Row([self.user_email])
-                                    ]),
+                                    ], spacing=2),
 
                                     ft.Column([
-                                        ft.Text(languages[self.language]['function'], size=12, font_family='PPI',
+                                        ft.Text(languages[self.language]['function'], size=12, font_family='PPM',
                                                 color='grey'),
                                         ft.Row([self.user_function])
-                                    ]),
+                                    ], spacing=2),
 
                                     ft.Column([
-                                        ft.Text(languages[self.language]['role'], size=12, font_family='PPI',
+                                        ft.Text(languages[self.language]['role'], size=12, font_family='PPM',
                                                 color='grey'),
                                         ft.Row([self.user_role])
-                                    ]),
+                                    ], spacing=2),
 
                                     ft.Column([
-                                        ft.Text(languages[self.language]['contact'], size=12, font_family='PPI',
+                                        ft.Text(languages[self.language]['contact'], size=12, font_family='PPM',
                                                 color='grey'),
                                         ft.Row([self.user_contact])
-                                    ]),
-                                    ft.Divider(),
+                                    ], spacing=2),
+                                    ft.Divider(color=ft.Colors.TRANSPARENT),
                                     MyButton(languages[self.language]['logout'], 'logout', None, self.logout)
                                 ], spacing=10
                             )
                         ),
                     ],
+                )
+            )
+        )
+        self.data_container = ft.Card(
+            elevation=20, shape=ft.RoundedRectangleBorder(radius=10), right=5, top=60,
+            scale=ft.Scale(0), animate_scale=ft.Animation(100, ft.AnimationCurve.BOUNCE_OUT),
+            content=ft.Container(
+                bgcolor='white', padding=20, border_radius=10, width=300, expand=True,
+                content=ft.Column(
+                    controls=[
+                        ft.Row(
+                            controls=[
+                                ft.Text(languages[language]['school year'].capitalize(), size=13, font_family='PPM'),
+                                ft.Container(
+                                    border_radius=16, padding=7, bgcolor=ft.Colors.TEAL_50,
+                                    content=ft.Row(
+                                        [
+                                            ft.Text(f"{self.year_label}", size=12, font_family="PPM", color="teal")
+                                        ], alignment=ft.MainAxisAlignment.CENTER, spacing=5,
+                                    )
+                                ),
+                            ], alignment=ft.MainAxisAlignment.SPACE_BETWEEN
+                        ),
+                        ft.Divider(height=1, thickness=1),
+                        ft.Row(
+                            controls=[
+                                ft.Text(languages[language]['active quarter'].capitalize(), size=13, font_family='PPM'),
+                                ft.Container(
+                                    border_radius=16, padding=7, bgcolor=ft.Colors.TEAL_50,
+                                    content=ft.Row(
+                                        [
+                                            self.active_quarter
+                                        ], alignment=ft.MainAxisAlignment.CENTER, spacing=5,
+                                    )
+                                ),
+                            ], alignment=ft.MainAxisAlignment.SPACE_BETWEEN
+                        ),
+                        ft.Divider(height=1, thickness=1),
+                        ft.Row(
+                            controls=[
+                                ft.Text(languages[language]['active sequence'].capitalize(), size=13, font_family='PPM'),
+                                ft.Container(
+                                    border_radius=16, padding=7, bgcolor=ft.Colors.TEAL_50,
+                                    content=ft.Row(
+                                        [
+                                            self.active_sequence
+                                        ], alignment=ft.MainAxisAlignment.CENTER, spacing=5,
+                                    )
+                                ),
+                            ], alignment=ft.MainAxisAlignment.SPACE_BETWEEN
+                        )
+                    ]
                 )
             )
         )
@@ -275,6 +320,7 @@ class Home(ft.View):
                             ]
                         ),
                         self.user_container,
+                        self.data_container
                     ]
                 )
             )
@@ -286,22 +332,52 @@ class Home(ft.View):
         self.box.update()
 
     def open_user_container(self, e):
-        global user_infos_is_active
-        user_infos_is_active = not user_infos_is_active
-        self.user_container.scale = 1 if user_infos_is_active else 0
-        self.user_container.update()
+        global menu_data_is_active, user_infos_is_active
 
-    def hide_show_menu(self, e):
-        global menu_is_active
+        if user_infos_is_active:
+            self.user_container.scale = 0
+            user_infos_is_active = False
 
-        if menu_is_active:
-            menu_is_active = False
-            self.left_menu.offset = ft.Offset(-1, 0)
-            self.left_menu.update()
+            # les autres ...
+            self.user_container.scale = 0
+            user_infos_is_active = False
+            self.page.update()
+
         else:
-            menu_is_active = True
-            self.left_menu.offset = ft.Offset(0, 0)
-            self.left_menu.update()
+            self.user_container.scale = 1
+            user_infos_is_active = True
+
+            # les autres...
+            self.data_container.scale = 0
+            menu_data_is_active = False
+            self.page.update()
+
+    def open_data_container(self, e):
+        global menu_data_is_active, user_infos_is_active
+
+        if menu_data_is_active:
+            self.data_container.scale = 0
+            menu_data_is_active = False
+
+            # les autres ...
+            self.user_container.scale = 0
+            user_infos_is_active = False
+            self.page.update()
+
+        else:
+            self.data_container.scale = 1
+            menu_data_is_active = True
+
+            # les autres...
+            self.user_container.scale = 0
+            user_infos_is_active = False
+            self.page.update()
+
+        # menu_data_is_active = not menu_data_is_active
+        # self.data_container.scale = 1 if menu_data_is_active else 0
+        # self.data_container.update()
+
+
 
 
 

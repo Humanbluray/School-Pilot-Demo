@@ -72,13 +72,19 @@ class NavBar(ft.Container):
                                 ),
                                 ft.Column(
                                     controls=[
-                                        ft.Text('School Pilot', size=16, font_family='PPB', color='black'),
+                                        ft.Text('School Pilot', size=20, font_family='PPB', color='black'),
                                         ft.Text('School management', size=11, font_family='PPM', color='grey')
                                     ], spacing=0
                                 )
                             ], alignment=ft.MainAxisAlignment.CENTER
                         ),
                         ft.Divider(height=1, color=ft.Colors.TRANSPARENT),
+                        ft.Row(
+                            [ft.Text('MENU', size=14, font_family='PPM'),],
+                            alignment=ft.MainAxisAlignment.CENTER
+                        ),
+                        ft.Divider(height=1, thickness=1),
+                        ft.Divider(height=2, color=ft.Colors.TRANSPARENT),
                         ft.Container(
                             padding=ft.padding.only(20, 0, 20, 0), expand=True,
                             content=ft.Column(
@@ -95,19 +101,15 @@ class NavBar(ft.Container):
                 ft.Column(
                     controls=[
                         ft.Container(
-                            padding=10,
+                            padding=10, alignment=ft.alignment.center,
                             content=ft.Column(
                                 horizontal_alignment=ft.CrossAxisAlignment.CENTER,
                                 controls=[
-                                    ft.Divider(height=1),
-                                    ft.Container(
-                                        bgcolor='#f0f0f6', border_radius=10, padding=5,
-                                        content=ft.Row(
-                                            controls=[
-                                                ft.Text(self.cp.current_year_label, size=12, font_family='PPM'),
-                                            ]
-                                        )
-                                    )
+                                    ft.Divider(height=1, thickness=1),
+                                    ft.Text(
+                                        self.cp.current_year_label, size=12, font_family='PPM'
+                                    ),
+
                                 ]
                             ),
                         )

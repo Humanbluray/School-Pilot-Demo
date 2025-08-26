@@ -349,7 +349,8 @@ class ReportBook(ft.Container):
 
         # fenêtre impression classes...
         self.pr_class = ft.Dropdown(
-            **drop_style, width=200, prefix_icon='roofing', menu_height=200,
+            **drop_style, prefix_icon='roofing', menu_height=200,
+            expand=True, text_align=ft.TextAlign.CENTER,
             options=[
                 ft.dropdown.Option(
                     key=' ', text=f"{languages[lang]['select option']}"
@@ -357,7 +358,8 @@ class ReportBook(ft.Container):
             ], value=" "
         )
         self.pr_type = ft.Dropdown(
-            **drop_style, width=200,
+            **drop_style, expand=True, text_align=ft.TextAlign.CENTER,
+            prefix_icon=ft.Icons.LABEL_OUTLINED,
             options=[
                 ft.dropdown.Option(key=" ", text=languages[lang]['select option']),
                 ft.dropdown.Option(key="monthly", text=languages[lang]['monthly']),
@@ -367,7 +369,8 @@ class ReportBook(ft.Container):
 
         )
         self.pr_quarter = ft.Dropdown(
-            **drop_style, width=200, prefix_icon=ft.Icons.CALENDAR_MONTH_SHARP,
+            **drop_style, expand=True, text_align=ft.TextAlign.CENTER,
+            prefix_icon=ft.Icons.CALENDAR_MONTH_SHARP,
             menu_height=200, visible=False, label=languages[lang]['quarter'],
             options=[
                 ft.dropdown.Option(key=" ", text=languages[lang]['select option']),
@@ -377,7 +380,8 @@ class ReportBook(ft.Container):
             ], value=" "
         )
         self.pr_sequence = ft.Dropdown(
-            **drop_style, width=200, prefix_icon=ft.Icons.CALENDAR_MONTH_SHARP, menu_height=200,
+            **drop_style, expand=True, text_align=ft.TextAlign.CENTER,
+            prefix_icon=ft.Icons.CALENDAR_MONTH_SHARP, menu_height=200,
             label=languages[lang]['sequence'],
             visible=False,
             options=[
@@ -525,9 +529,9 @@ class ReportBook(ft.Container):
         self.cp.left_menu.disabled = True
         self.cp.top_menu.disabled = True
         self.main_window.disabled = True
-        self.cp.left_menu.opacity = 0.3
-        self.cp.top_menu.opacity = 0.3
-        self.main_window.opacity = 0.3
+        self.cp.left_menu.opacity = 0.1
+        self.cp.top_menu.opacity = 0.1
+        self.main_window.opacity = 0.1
         self.cp.page.update()
 
     @staticmethod
