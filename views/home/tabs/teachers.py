@@ -806,9 +806,9 @@ class Teachers(ft.Container):
         self.cp.left_menu.disabled = True
         self.cp.top_menu.disabled = True
         self.main_window.disabled = True
-        self.cp.left_menu.opacity = 0.3
-        self.cp.top_menu.opacity = 0.3
-        self.main_window.opacity = 0.3
+        self.cp.left_menu.opacity = 0.1
+        self.cp.top_menu.opacity = 0.1
+        self.main_window.opacity = 0.1
         self.cp.page.update()
 
     async def build_main_view(self):

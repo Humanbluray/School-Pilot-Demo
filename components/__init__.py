@@ -232,11 +232,12 @@ class ColoredIcon(ft.Container):
 class ColoredButton(ft.Container):
     def __init__(self, text: str,icon: str, click):
         super().__init__(
-            border_radius=12, alignment=ft.alignment.center, padding=10,
+            border_radius=16, alignment=ft.alignment.center, padding=10, width=40,
+            animate_size=ft.Animation(300, ft.AnimationCurve.DECELERATE),
             on_click=click, bgcolor='#f0f0f6',
             content=ft.Row(
                 controls=[
-                    ft.Icon(icon, size=16, color='black'),
+                    ft.Icon(icon, size=24, color='black'),
                     ft.Text(text, size=12, font_family='PPM', color='black')
                 ], alignment=ft.MainAxisAlignment.CENTER
             ), on_hover=self.on_hover_effect
@@ -244,10 +245,10 @@ class ColoredButton(ft.Container):
 
     def on_hover_effect(self, e):
         if e.data == 'true':
-            self.bgcolor = BASE_COLOR
+            self.width = None
             self.update()
         else:
-            self.bgcolor = '#f0f0f6'
+            self.width = 40
             self.update()
 
 
