@@ -65,19 +65,19 @@ class Signin(ft.View):
                             controls=[
                                 ft.Column(
                                     controls=[
-                                        ft.Text("School Pilot", size=84, font_family='PPB'),
-                                        ft.Text("La solution pour votre établissement scolaire", size=13, font_family='PPM'),
-                                        ft.Text("Lorel Ipsum", size=13,
-                                                font_family='PPM')
+                                        ft.Text("School Pilot", size=72, font_family='PPB'),
+                                        ft.Text("La solution pour votre établissement scolaire", size=16, font_family='PPI'),
+                                        ft.Text("", size=16,
+                                                font_family='PPI')
                                     ], horizontal_alignment=ft.CrossAxisAlignment.CENTER, spacing=0
                                 ),
                                 ft.Card(
                                     elevation=10, shape=ft.RoundedRectangleBorder(radius=24),
                                     content=ft.Container(
-                                        padding=0, alignment=ft.alignment.center, bgcolor='white', width=500,
+                                        padding=0, alignment=ft.alignment.center, bgcolor='white', width=400,
                                         border_radius=24,
                                         content=ft.Container(
-                                            padding=50,
+                                            padding=20,
                                             content=ft.Column(
                                                 controls=[
                                                     ft.Container(

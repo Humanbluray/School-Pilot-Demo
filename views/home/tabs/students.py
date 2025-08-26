@@ -62,7 +62,7 @@ class Students(ft.Container):
         self.main_window = ft.Container(
             expand=True, content=ft.Column(
                 expand=True, controls=[
-                    ft.Text(languages[lang]['students table'].capitalize(), size=20, font_family='PPB'),
+                    ft.Text(languages[lang]['students table'].capitalize(), size=16, font_family='PPB'),
                     ft.Row(
                         expand=True,
                         controls=[
@@ -115,10 +115,10 @@ class Students(ft.Container):
                                             content=ft.Row(
                                                 controls=[
                                                     ft.IconButton(ft.Icons.KEYBOARD_ARROW_LEFT_ROUNDED,
-                                                                  icon_color='black',icon_size=18),
+                                                                  icon_color='black',icon_size=18, bgcolor='#f0f0f6'),
                                                     ft.Text('page 1 de 1', size=13, font_family='PPM'),
                                                     ft.IconButton(ft.Icons.KEYBOARD_ARROW_RIGHT_ROUNDED,
-                                                                  icon_color='black',icon_size=18),
+                                                                  icon_color='black',icon_size=18, bgcolor='#f0f0f6'),
 
                                                 ], alignment=ft.MainAxisAlignment.END
                                             )
@@ -674,6 +674,7 @@ class Students(ft.Container):
                             ),
                             border_radius=ft.border_radius.only(bottom_left=8, bottom_right=8), expand=True,
                             content=ft.Column(
+                                expand=True, scroll=ft.ScrollMode.AUTO,
                                 controls=[
                                     ft.Column(
                                         controls=[
@@ -721,7 +722,7 @@ class Students(ft.Container):
                                         ]
                                     ),
 
-                                ], spacing=10, expand=True
+                                ], spacing=10,
                             )
                         )
                     ], spacing=0
