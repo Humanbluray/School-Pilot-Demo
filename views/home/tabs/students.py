@@ -17,11 +17,13 @@ import datetime
 import os
 import io
 
+
 # Bucket for pictures
 BUCKET_STUDENTS_PICTURES = "students_pictures"
 BUCKET_REGISTRATIONS = 'receipts'
 DEFAULT_IMAGE_URL = ''
 selected_fees = ''
+students_page_number = 1
 
 
 class Students(ft.Container):
@@ -50,14 +52,20 @@ class Students(ft.Container):
                 ft.DataColumn(ft.Text('Actions'))
             ]
         )
+        self.back_bt = ft.IconButton(
+            ft.Icons.ARROW_CIRCLE_LEFT_OUTLINED, icon_size=20, icon_color="black", bgcolor="#f0f0f6",
+            on_click=self.click_back
+        )
+        self.forward_bt = ft.IconButton(
+            ft.Icons.ARROW_CIRCLE_RIGHT_OUTLINED, icon_size=20, icon_color="black", bgcolor="#f0f0f6",
+            on_click=self.click_forward
+        )
+        self.nb_result_search = ft.Text(size=12, font_family="PPI", color='grey')
+        self.page_number = ft.Text(f"{students_page_number}", size=12, font_family='PPM')
 
         self.registered_count = ft.Text('-', size=28, font_family="PPM", weight=ft.FontWeight.BOLD)
         self.boys = ft.Text('-', size=28, font_family="PPM", weight=ft.FontWeight.BOLD)
         self.girls = ft.Text('-', size=28, font_family="PPM", weight=ft.FontWeight.BOLD)
-        self.completed_rate = ft.Text('-', size=28, font_family="PPM", weight=ft.FontWeight.BOLD)
-        self.pb_rate = ft.ProgressBar(
-            color=BASE_COLOR, bgcolor='amber50', height=10, border_radius=10, width=150
-        )
 
         self.main_window = ft.Container(
             expand=True, content=ft.Column(
@@ -114,12 +122,8 @@ class Students(ft.Container):
                                             padding=10,
                                             content=ft.Row(
                                                 controls=[
-                                                    ft.IconButton(ft.Icons.KEYBOARD_ARROW_LEFT_ROUNDED,
-                                                                  icon_color='black',icon_size=18, bgcolor='#f0f0f6'),
-                                                    ft.Text('page 1 de 1', size=13, font_family='PPM'),
-                                                    ft.IconButton(ft.Icons.KEYBOARD_ARROW_RIGHT_ROUNDED,
-                                                                  icon_color='black',icon_size=18, bgcolor='#f0f0f6'),
-
+                                                    self.nb_result_search,
+                                                    ft.Row([self.back_bt, self.page_number, self.forward_bt])
                                                 ], alignment=ft.MainAxisAlignment.END
                                             )
                                         )
@@ -197,31 +201,6 @@ class Students(ft.Container):
                                                     controls=[
                                                         self.girls,
                                                         ft.Text(languages[self.lang]['girls registered'], size=11,
-                                                                font_family='PPI',
-                                                                color='grey')
-                                                    ], spacing=0
-                                                )
-                                            ], horizontal_alignment=ft.CrossAxisAlignment.CENTER
-                                        )
-                                    ),
-                                    ft.Container(
-                                        width=170, height=120, padding=10, border_radius=24,
-                                        border=ft.border.all(1, 'white'),
-                                        bgcolor='white',
-                                        content=ft.Column(
-                                            controls=[
-                                                ft.Row(
-                                                    controls=[
-                                                        ColoredIcon(ft.Icons.PIE_CHART_ROUNDED, 'green', 'green50'),
-                                                        ft.Text(languages[self.lang]['cp'].upper(), size=12,
-                                                                font_family='PPI',
-                                                                color='green')
-                                                    ], alignment=ft.MainAxisAlignment.START
-                                                ),
-                                                ft.Column(
-                                                    controls=[
-                                                        self.completed_rate,
-                                                        ft.Text(languages[self.lang]['complete profiles'], size=11,
                                                                 font_family='PPI',
                                                                 color='grey')
                                                     ], spacing=0
@@ -1108,11 +1087,21 @@ class Students(ft.Container):
         self.run_async_in_thread(self.on_init_async())
 
     async def load_datas(self):
-        active_classes = await get_active_classes(self.cp.page.client_storage.get("access_token"))
+        global students_page_number
+        access_token = self.cp.page.client_storage.get("access_token")
+        year_id = self.cp.year_id
+        students_page_number = 0
+        self.forward_bt.disabled = False
 
         self.table.rows.clear()
-        boys, girls, completed_profiles = 0, 0, 0
-        details = await get_students_with_details(self.cp.page.client_storage.get("access_token"))
+        boys, girls, = 0, 0
+
+        details = await get_students_with_details(
+            students_page_number, access_token, year_id
+        )
+        self.page_number.value = f"page {students_page_number + 1}"
+        self.nb_result_search.value = f"Résultats de {students_page_number + 1} à {(students_page_number + 1) * 100}"
+        self.back_bt.disabled = True
 
         for i, detail in enumerate(details):
             if detail['image_url']:
@@ -1120,14 +1109,13 @@ class Students(ft.Container):
                 bgcolor = 'teal50'
                 status = languages[self.lang]['complete']
                 icone = 'check_circle'
-                completed_profiles += 1
             else:
                 color = 'red'
                 bgcolor = 'red50'
                 status = languages[self.lang]['incomplete']
                 icone = ft.Icons.INDETERMINATE_CHECK_BOX_OUTLINED
 
-            if detail['gender'] == 'M':
+            if detail['student_gender'] == 'M':
                 boys += 1
             else:
                 girls += 1
@@ -1139,7 +1127,7 @@ class Students(ft.Container):
                             ft.Row(
                                 controls=[
                                     ft.CircleAvatar(radius=15, foreground_image_src=detail['image_url']),
-                                    ft.Text(f"{detail['name']} {detail['surname']}".upper())
+                                    ft.Text(f"{detail['student_name']} {detail['student_surname']}".upper())
                                 ]
                             )
                         ),
@@ -1204,110 +1192,348 @@ class Students(ft.Container):
                 ),
             )
 
-        await self.build_main_view()
         self.boys.value = boys
         self.girls.value = girls
         self.registered_count.value = len(details)
-        self.completed_rate.value = f"{completed_profiles * 100 / len(details):.0f} %"
-        self.pb_rate.value = completed_profiles / len(details)
-        self.cp.page.update()
+        await self.build_main_view()
 
     async def filter_datas(self, e):
-        details = await get_students_with_details(self.cp.page.client_storage.get("access_token"))
-        search = self.search.value.lower() if self.search else ''
+        access_token = self.cp.page.client_storage.get("access_token")
+        year_id = self.cp.year_id
+        details = await get_students_with_details_wf(
+            students_page_number, access_token, year_id
+        )
+        search = self.search.value.lower()
 
-        filtered_datas = list(filter(lambda x: search in x['name'].lower() or search in x['surname'].lower(), details))
-        print(len(filtered_datas))
-        self.table.rows.clear()
+        if search:
+            filtered_datas = list(filter(lambda x: search in x['student_name'].lower() or search in x['student_surname'].lower(), details))
+            print(len(filtered_datas))
+            self.table.rows.clear()
 
-        for i, detail in enumerate(filtered_datas):
-            if detail['image_url']:
-                color = 'teal'
-                bgcolor = 'teal50'
-                status = languages[self.lang]['complete']
-                icone = 'check_circle'
-            else:
-                color = 'red'
-                bgcolor = 'red50'
-                status = languages[self.lang]['incomplete']
-                icone = ft.Icons.INDETERMINATE_CHECK_BOX_OUTLINED
+            for i, detail in enumerate(filtered_datas):
+                if detail['image_url']:
+                    color = 'teal'
+                    bgcolor = 'teal50'
+                    status = languages[self.lang]['complete']
+                    icone = 'check_circle'
+                else:
+                    color = 'red'
+                    bgcolor = 'red50'
+                    status = languages[self.lang]['incomplete']
+                    icone = ft.Icons.INDETERMINATE_CHECK_BOX_OUTLINED
 
-            self.table.rows.append(
-                ft.DataRow(
-                    cells=[
-                        ft.DataCell(
-                            ft.Row(
-                                controls=[
-                                    ft.CircleAvatar(radius=15, foreground_image_src=detail['image_url']),
-                                    ft.Text(f"{detail['name']} {detail['surname']}".upper())
-                                ]
-                            )
-                        ),
-                        ft.DataCell(
-                            ft.Container(
-                                bgcolor=bgcolor, padding=5, border_radius=10, width=100,
-                                content=ft.Row(
+                self.table.rows.append(
+                    ft.DataRow(
+                        cells=[
+                            ft.DataCell(
+                                ft.Row(
                                     controls=[
-                                        ft.Icon(icone, size=16, color=color),
-                                        ft.Text(status, size=11, font_family='PPM', color=color)
-                                    ], alignment=ft.MainAxisAlignment.CENTER, spacing=2
+                                        ft.CircleAvatar(radius=15, foreground_image_src=detail['image_url']),
+                                        ft.Text(f"{detail['student_name']} {detail['student_surname']}".upper())
+                                    ]
+                                )
+                            ),
+                            ft.DataCell(
+                                ft.Container(
+                                    bgcolor=bgcolor, padding=5, border_radius=10, width=100,
+                                    content=ft.Row(
+                                        controls=[
+                                            ft.Icon(icone, size=16, color=color),
+                                            ft.Text(status, size=11, font_family='PPM', color=color)
+                                        ], alignment=ft.MainAxisAlignment.CENTER, spacing=2
+                                    )
+                                )
+                            ),
+                            ft.DataCell(ft.Text(detail['class_code'])),
+                            ft.DataCell(
+                                ft.Row(
+                                    controls=[
+                                        MyMiniIcon('edit_outlined', '', 'grey', detail, self.open_edit_window),
+                                        ft.PopupMenuButton(
+                                            bgcolor='white',
+                                            content=ft.Icon(ft.Icons.FORMAT_LIST_BULLETED_SHARP, size=18, color='grey'),
+                                            items=[
+                                                ft.PopupMenuItem(
+                                                    content=ft.Row(
+                                                        controls=[
+                                                            ft.Icon(ft.Icons.ATTACH_MONEY, size=18, color='black54'),
+                                                            ft.Text(languages[self.lang]['school fees'], size=13,
+                                                                    font_family='PPM')
+                                                        ]
+                                                    ), on_click=self.open_school_fees_window, data=detail
+                                                ),
+                                                ft.PopupMenuItem(
+                                                    content=ft.Row(
+                                                        controls=[
+                                                            ft.Icon(ft.Icons.DANGEROUS_OUTLINED, size=18, color='black54'),
+                                                            ft.Text(languages[self.lang]['alert'], size=13,
+                                                                    font_family='PPM')
+                                                        ]
+                                                    ), on_click=None
+                                                ),
+                                                ft.PopupMenuItem(
+                                                    content=ft.Row(
+                                                        controls=[
+                                                            ft.Icon(ft.Icons.PRINT_OUTLINED, size=18, color='black54'),
+                                                            ft.Text(languages[self.lang]['print receipt'], size=13,
+                                                                    font_family='PPM'),
+                                                            ft.IconButton(
+                                                                ft.Icons.ATTACH_FILE, icon_size=18, icon_color='black87',
+                                                                url=detail['receipt_url'],
+                                                                visible=True if detail['receipt_url'] else False
+                                                            )
+                                                        ]
+                                                    ), on_click=None
+                                                )
+                                            ]
+                                        )
+                                    ], spacing=0
                                 )
                             )
-                        ),
-                        ft.DataCell(ft.Text(detail['class_code'])),
-                        ft.DataCell(
-                            ft.Row(
-                                controls=[
-                                    MyMiniIcon('edit_outlined', '', 'grey', detail, self.open_edit_window),
-                                    ft.PopupMenuButton(
-                                        bgcolor='white',
-                                        content=ft.Icon(ft.Icons.FORMAT_LIST_BULLETED_SHARP, size=18, color='grey'),
-                                        items=[
-                                            ft.PopupMenuItem(
-                                                content=ft.Row(
-                                                    controls=[
-                                                        ft.Icon(ft.Icons.ATTACH_MONEY, size=18, color='black54'),
-                                                        ft.Text(languages[self.lang]['school fees'], size=13,
-                                                                font_family='PPM')
-                                                    ]
-                                                ), on_click=self.open_school_fees_window, data=detail
-                                            ),
-                                            ft.PopupMenuItem(
-                                                content=ft.Row(
-                                                    controls=[
-                                                        ft.Icon(ft.Icons.DANGEROUS_OUTLINED, size=18, color='black54'),
-                                                        ft.Text(languages[self.lang]['alert'], size=13,
-                                                                font_family='PPM')
-                                                    ]
-                                                ), on_click=None
-                                            ),
-                                            ft.PopupMenuItem(
-                                                content=ft.Row(
-                                                    controls=[
-                                                        ft.Icon(ft.Icons.PRINT_OUTLINED, size=18, color='black54'),
-                                                        ft.Text(languages[self.lang]['print receipt'], size=13,
-                                                                font_family='PPM'),
-                                                        ft.IconButton(
-                                                            ft.Icons.ATTACH_FILE, icon_size=18, icon_color='black87',
-                                                            url=detail['receipt_url'],
-                                                            visible=True if detail['receipt_url'] else False
-                                                        )
-                                                    ]
-                                                ), on_click=None
-                                            )
-                                        ]
-                                    )
-                                ], spacing=0
-                            )
-                        )
-                    ],
-                ),
-            )
+                        ],
+                    ),
+                )
 
-        self.table.update()
+            self.page_number.value = "page 1"
+            self.back_bt.disabled = True
+            self.forward_bt.disabled = True
+            self.nb_result_search.value = f"{len(filtered_datas)} {languages[self.lang]['result']}"
+            self.cp.page.update()
+
+        else:
+            self.table.rows.clear()
+            await self.load_datas()
 
     def on_search_change(self, e):
         self.run_async_in_thread(self.filter_datas(e))
+
+    async def load_click_forward(self, e):
+        global students_page_number
+        access_token = self.cp.page.client_storage.get('access_token')
+        year_id = self.cp.year_id
+        students_page_number += 1
+        self.forward_bt.disabled = False
+
+        self.table.rows.clear()
+
+        details = await get_students_with_details(
+            students_page_number, access_token, year_id
+        )
+        step = 100
+        start = (students_page_number - 1) * 100 + 1
+        end = start + step - 1
+        self.nb_result_search.value = f"Résultats de {start} à {end}"
+        self.back_bt.disabled = True
+        self.page_number.value = f"page {students_page_number}"
+
+        if details:
+            for i, detail in enumerate(details):
+                if detail['image_url']:
+                    color = 'teal'
+                    bgcolor = 'teal50'
+                    status = languages[self.lang]['complete']
+                    icone = 'check_circle'
+
+                else:
+                    color = 'red'
+                    bgcolor = 'red50'
+                    status = languages[self.lang]['incomplete']
+                    icone = ft.Icons.INDETERMINATE_CHECK_BOX_OUTLINED
+
+                self.table.rows.append(
+                    ft.DataRow(
+                        cells=[
+                            ft.DataCell(
+                                ft.Row(
+                                    controls=[
+                                        ft.CircleAvatar(radius=15, foreground_image_src=detail['image_url']),
+                                        ft.Text(f"{detail['student_name']} {detail['student_surname']}".upper())
+                                    ]
+                                )
+                            ),
+                            ft.DataCell(
+                                ft.Container(
+                                    bgcolor=bgcolor, padding=5, border_radius=10, width=100,
+                                    content=ft.Row(
+                                        controls=[
+                                            ft.Icon(icone, size=16, color=color),
+                                            ft.Text(status, size=11, font_family='PPM', color=color)
+                                        ], alignment=ft.MainAxisAlignment.CENTER, spacing=2
+                                    )
+                                )
+                            ),
+                            ft.DataCell(ft.Text(detail['class_code'])),
+                            ft.DataCell(
+                                ft.Row(
+                                    controls=[
+                                        MyMiniIcon('edit_outlined', '', 'grey', detail, self.open_edit_window),
+                                        ft.PopupMenuButton(
+                                            bgcolor='white',
+                                            content=ft.Icon(ft.Icons.FORMAT_LIST_BULLETED_SHARP, size=18, color='grey'),
+                                            items=[
+                                                ft.PopupMenuItem(
+                                                    content=ft.Row(
+                                                        controls=[
+                                                            ft.Icon(ft.Icons.ATTACH_MONEY, size=18, color='black54'),
+                                                            ft.Text(languages[self.lang]['school fees'], size=13,
+                                                                    font_family='PPM')
+                                                        ]
+                                                    ), on_click=self.open_school_fees_window, data=detail
+                                                ),
+                                                ft.PopupMenuItem(
+                                                    content=ft.Row(
+                                                        controls=[
+                                                            ft.Icon(ft.Icons.DANGEROUS_OUTLINED, size=18, color='black54'),
+                                                            ft.Text(languages[self.lang]['alert'], size=13,
+                                                                    font_family='PPM')
+                                                        ]
+                                                    ), on_click=None
+                                                ),
+                                                ft.PopupMenuItem(
+                                                    content=ft.Row(
+                                                        controls=[
+                                                            ft.Icon(ft.Icons.PRINT_OUTLINED, size=18, color='black54'),
+                                                            ft.Text(languages[self.lang]['print receipt'], size=13,
+                                                                    font_family='PPM'),
+                                                            ft.IconButton(
+                                                                ft.Icons.ATTACH_FILE, icon_size=18, icon_color='black87',
+                                                                url=detail['receipt_url'],
+                                                                visible=True if detail['receipt_url'] else False
+                                                            )
+                                                        ]
+                                                    ), on_click=None
+                                                )
+                                            ]
+                                        )
+                                    ], spacing=0
+                                )
+                            )
+                        ],
+                    ),
+                )
+
+            self.cp.page.update()
+        else:
+            pass
+
+    async def load_click_back(self, e):
+        global students_page_number
+        access_token = self.cp.page.client_storage.get('access_token')
+        year_id = self.cp.year_id
+        students_page_number -= 1
+
+        self.table.rows.clear()
+        details = await get_students_with_details(
+            students_page_number, access_token, year_id
+        )
+        step = 100
+        start = (students_page_number - 1) * 100 + 1
+        end = start + step - 1
+        self.nb_result_search.value = f"Résultats de {start} à {end}"
+        self.back_bt.disabled = True
+        self.page_number.value = f"page {students_page_number}"
+
+        if details:
+            for i, detail in enumerate(details):
+                if detail['image_url']:
+                    color = 'teal'
+                    bgcolor = 'teal50'
+                    status = languages[self.lang]['complete']
+                    icone = 'check_circle'
+
+                else:
+                    color = 'red'
+                    bgcolor = 'red50'
+                    status = languages[self.lang]['incomplete']
+                    icone = ft.Icons.INDETERMINATE_CHECK_BOX_OUTLINED
+
+                self.table.rows.append(
+                    ft.DataRow(
+                        cells=[
+                            ft.DataCell(
+                                ft.Row(
+                                    controls=[
+                                        ft.CircleAvatar(radius=15, foreground_image_src=detail['image_url']),
+                                        ft.Text(f"{detail['student_name']} {detail['student_surname']}".upper())
+                                    ]
+                                )
+                            ),
+                            ft.DataCell(
+                                ft.Container(
+                                    bgcolor=bgcolor, padding=5, border_radius=10, width=100,
+                                    content=ft.Row(
+                                        controls=[
+                                            ft.Icon(icone, size=16, color=color),
+                                            ft.Text(status, size=11, font_family='PPM', color=color)
+                                        ], alignment=ft.MainAxisAlignment.CENTER, spacing=2
+                                    )
+                                )
+                            ),
+                            ft.DataCell(ft.Text(detail['class_code'])),
+                            ft.DataCell(
+                                ft.Row(
+                                    controls=[
+                                        MyMiniIcon('edit_outlined', '', 'grey', detail, self.open_edit_window),
+                                        ft.PopupMenuButton(
+                                            bgcolor='white',
+                                            content=ft.Icon(ft.Icons.FORMAT_LIST_BULLETED_SHARP, size=18, color='grey'),
+                                            items=[
+                                                ft.PopupMenuItem(
+                                                    content=ft.Row(
+                                                        controls=[
+                                                            ft.Icon(ft.Icons.ATTACH_MONEY, size=18, color='black54'),
+                                                            ft.Text(languages[self.lang]['school fees'], size=13,
+                                                                    font_family='PPM')
+                                                        ]
+                                                    ), on_click=self.open_school_fees_window, data=detail
+                                                ),
+                                                ft.PopupMenuItem(
+                                                    content=ft.Row(
+                                                        controls=[
+                                                            ft.Icon(ft.Icons.DANGEROUS_OUTLINED, size=18, color='black54'),
+                                                            ft.Text(languages[self.lang]['alert'], size=13,
+                                                                    font_family='PPM')
+                                                        ]
+                                                    ), on_click=None
+                                                ),
+                                                ft.PopupMenuItem(
+                                                    content=ft.Row(
+                                                        controls=[
+                                                            ft.Icon(ft.Icons.PRINT_OUTLINED, size=18, color='black54'),
+                                                            ft.Text(languages[self.lang]['print receipt'], size=13,
+                                                                    font_family='PPM'),
+                                                            ft.IconButton(
+                                                                ft.Icons.ATTACH_FILE, icon_size=18, icon_color='black87',
+                                                                url=detail['receipt_url'],
+                                                                visible=True if detail['receipt_url'] else False
+                                                            )
+                                                        ]
+                                                    ), on_click=None
+                                                )
+                                            ]
+                                        )
+                                    ], spacing=0
+                                )
+                            )
+                        ],
+                    ),
+                )
+
+            if students_page_number == 1:
+                self.back_bt.disabled = True
+            else:
+                self.back_bt.disabled = False
+
+            self.cp.page.update()
+
+        else:
+            pass
+
+    def click_back(self, e):
+        self.run_async_in_thread(self.load_click_back(e))
+
+    def click_forward(self, e):
+        self.run_async_in_thread(self.load_click_forward(e))
 
     def open_new_student_container(self, e):
         role = self.cp.page.client_storage.get('role')
@@ -1343,7 +1569,7 @@ class Students(ft.Container):
         for student in students:
             self.unregistered.options.append(
                 ft.dropdown.Option(
-                    key=student['id'], text=f"{student['name']} {student['surname']}".upper()
+                    key=student['student_id'], text=f"{student['student_name']} {student['student_surname']}".upper()
                 )
             )
 

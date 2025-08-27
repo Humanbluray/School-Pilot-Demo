@@ -46,61 +46,66 @@ async def get_active_year_id(access_token) -> str:
         return data[0]['id'] if data else None
 
 
-async def get_all_notes_with_details(access_token: str) -> list[dict]:
+async def get_all_notes_with_details(
+    access_token: str, year_id: str, subject_id: str, class_id: str, sequence: str
+) -> list[dict]:
     """
-    retourne l'ensemble des notes pour l'année scolaire active
+
     :param access_token:
+    :param year_id:
+    :param subject_id:
+    :param class_id:
+    :param sequence:
     :return:
     """
-    # Récupérer l’année active
-    year_id = await get_active_year_id(access_token)
-
+    query_url = f"{url}/rest/v1/notes_view"
+    params = {
+        "select": "*",
+        "year_id": f"eq.{year_id}",
+        "subject_id": f"eq.{subject_id}",
+        "class_id": f"eq.{class_id}",
+        "sequence": f"eq.{sequence}",
+    }
     headers = {
-        "Authorization": f"Bearer {access_token}",
         "apikey": key,
-        "Accept": "application/json"
+        "Authorization": f"Bearer {access_token}"
     }
 
     async with httpx.AsyncClient() as client:
-        res = await client.get(
-            f"{url}/rest/v1/notes",
-            headers=headers,
-            params={
-                "select": (
-                    "id,value,sequence,coefficient,author,"
-                    "student_id:students(id,name,surname),"
-                    "class_id:classes(id,code),"
-                    "subject_id:subjects(id,name,short_name)"
-                ),
-                "year_id": f"eq.{year_id}"
-            }
-        )
+        response = await client.get(query_url, headers=headers, params=params)
 
-        if res.status_code != 200:
-            print("Erreur récupération notes:", res.text)
+        if response.status_code != 200:
+            print("Erreur :", response.text)
             return []
 
-        notes = res.json()
+        return response.json()
 
-        results = []
-        for note in notes:
-            results.append({
-                "note_id": note["id"],
-                "author": note["author"],
-                "valeur": note["value"],
-                "sequence": note["sequence"],
-                "coefficient": note["coefficient"],
-                "student_id": note["student_id"]["id"],
-                "student_name": note["student_id"]["name"],
-                "student_surname": note["student_id"]["surname"],
-                "class_id": note["class_id"]["id"],
-                "class_code": note["class_id"]["code"],
-                "subject_id": note["subject_id"]["id"],
-                "subject_name": note["subject_id"]["name"],
-                "subject_short_name": note["subject_id"]["short_name"],
-            })
 
-        return results
+async def get_all_notes(
+    page_number: int, access_token: str, year_id: str,
+) -> list[dict]:
+    """"""
+    decalage = page_number * 100
+    query_url = f"{url}/rest/v1/notes_view"
+    params = {
+        "select": "*",
+        "limit": 100,
+        "offset": decalage,
+        "year_id": f"eq.{year_id}",
+    }
+    headers = {
+        "apikey": key,
+        "Authorization": f"Bearer {access_token}"
+    }
+
+    async with httpx.AsyncClient() as client:
+        response = await client.get(query_url, headers=headers, params=params)
+
+        if response.status_code != 200:
+            print("Erreur :", response.text)
+            return []
+
+        return response.json()
 
 
 async def get_students_without_note_for_subject(

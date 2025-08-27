@@ -16,6 +16,7 @@ from reportlab.pdfbase.ttfonts import TTFont
 from reportlab.lib.utils import ImageReader
 
 DOCUMENTS_BUCKET = 'documents'
+rep_page_number = 0
 
 
 class ReportBook(ft.Container):
@@ -110,23 +111,33 @@ class ReportBook(ft.Container):
         self.table = ft.DataTable(
             **datatable_style, columns=[
                 ft.DataColumn(ft.Text(option)) for option in [
-                    languages[lang]['name'], languages[lang]['class'], languages[lang]['sequence'],
-                    languages[lang]['points'], languages[lang]['coefficient'], languages[lang]['average'],
-                    languages[lang]['status'], languages[lang]['rank'], 'Actions'
+                    languages[lang]['name'].capitalize(), languages[lang]['class'].capitalize(),
+                    languages[lang]['sequence'].capitalize(),
+                    languages[lang]['points'].capitalize(), languages[lang]['coefficient'].capitalize(),
+                    languages[lang]['average'].capitalize(),
+                    languages[lang]['status'].capitalize(), languages[lang]['rank'].capitalize(),'Actions'
                 ]
             ]
         )
+        self.back_bt = ft.IconButton(
+            ft.Icons.ARROW_CIRCLE_LEFT_OUTLINED, icon_size=20, icon_color="black", bgcolor="#f0f0f6",
+            on_click=self.click_back
+        )
+        self.forward_bt = ft.IconButton(
+            ft.Icons.ARROW_CIRCLE_RIGHT_OUTLINED, icon_size=20, icon_color="black", bgcolor="#f0f0f6",
+            on_click=self.click_forward
+        )
+        self.nb_result_search = ft.Text(size=12, font_family="PPI", color='grey')
+        self.page_number = ft.Text(f"{rep_page_number}", size=12, font_family='PPM')
+
+        self.registered_count = ft.Text('-', size=28, font_family="PPM", weight=ft.FontWeight.BOLD)
+        self.boys = ft.Text('-', size=28, font_family="PPM", weight=ft.FontWeight.BOLD)
+        self.girls = ft.Text('-', size=28, font_family="PPM", weight=ft.FontWeight.BOLD)
+
         self.main_window = ft.Container(
             expand=True, content=ft.Column(
                 controls=[
-                    # kpi...
-                    ft.Row(
-                        controls=[
-                            self.ct_success, ft.VerticalDivider(),
-                            self.ct_fails, ft.VerticalDivider(),
-                            self.ct_rate
-                        ]
-                    ),
+                    ft.Text(languages[lang]['menu report book'].capitalize(), size=16, font_family='PPB'),
                     ft.Row(
                         expand=True,
                         controls=[
@@ -135,47 +146,26 @@ class ReportBook(ft.Container):
                                 content=ft.Column(
                                     controls=[
                                         ft.Container(
-                                            padding=20,
+                                            padding=20, border=ft.border.all(1, "#f0f0f6"),
                                             content=ft.Row(
                                                 controls=[
                                                     ft.Row(
                                                         controls=[
                                                             ColoredButton(
-                                                                languages[lang]['quarterly reports'],
-                                                                ft.Icons.FOLDER_OPEN,
+                                                                languages[lang]['annual reports'],
+                                                                ft.Icons.SCHOOL_ROUNDED,
                                                                 None
                                                             ),
                                                             ColoredButton(
-                                                                languages[lang]['annual reports'], ft.Icons.RULE_FOLDER_OUTLINED,
+                                                                languages[lang]['quarterly reports'],
+                                                                ft.Icons.RULE_FOLDER_SHARP,
                                                                 None
                                                             ),
                                                             ColoredButton(
                                                                 languages[lang]['class print'],
                                                                 ft.Icons.PRINT_ROUNDED,
                                                                 self.open_pr_window
-                                                            )
-                                                        ]
-                                                    ),
-                                                    self.search
-                                                ], alignment=ft.MainAxisAlignment.SPACE_BETWEEN
-                                            )
-                                        ),
-                                        ft.ListView(expand=True, controls=[self.table]),
-                                        ft.Container(
-                                            padding=20,
-                                            content=ft.Row(
-                                                controls=[
-                                                    ft.Row(
-                                                        controls=[
-                                                            ft.Icon(
-                                                                ft.Icons.DOWNLOAD_DONE, size=20, color="black87"
                                                             ),
-                                                            ft.Text(languages[lang]['data extraction'].upper(), size=12,
-                                                                    font_family='PPB'),
-                                                        ]
-                                                    ),
-                                                    ft.Row(
-                                                        controls=[
                                                             ColoredButton(
                                                                 languages[lang]['pdf format'],
                                                                 ft.Icons.PICTURE_AS_PDF_SHARP,
@@ -187,10 +177,21 @@ class ReportBook(ft.Container):
                                                                 None
                                                             )
                                                         ]
-                                                    )
+                                                    ),
+                                                    self.search
                                                 ], alignment=ft.MainAxisAlignment.SPACE_BETWEEN
                                             )
                                         ),
+                                        ft.ListView(expand=True, controls=[self.table]),
+                                        ft.Container(
+                                            padding=10,
+                                            content=ft.Row(
+                                                controls=[
+                                                    self.nb_result_search,
+                                                    ft.Row([self.back_bt, self.page_number, self.forward_bt])
+                                                ], alignment=ft.MainAxisAlignment.END
+                                            )
+                                        )
                                     ]
                                 )
                             )
@@ -567,22 +568,22 @@ class ReportBook(ft.Container):
         # Datatable...
         datas = await get_sequence_averages_with_details(access_token, year_id)
 
-        nb_success = 0
-        nb_fails = 0
-
         self.table.rows.clear()
 
         for i, item in enumerate(datas):
-            # if i == 0:
-            #     for clef in item.keys():
-            #         print(f"{clef}: {item[clef]}")
 
             if item['value'] >= 10:
-                status_icon = ColoredIcon(ft.Icons.CHECK_CIRCLE, 'teal', 'teal50')
-                nb_success += 1
+                status_text = languages[self.lang]['success']
+                status_icon = ft.Icons.CHECK_CIRCLE
+                status_color = ft.Colors.TEAL
+                status_bg_color = ft.Colors.TEAL_50
+
             else:
-                status_icon = ColoredIcon(ft.Icons.CLOSE, 'red', 'red50')
-                nb_fails += 1
+                status_text = languages[self.lang]['failure']
+                status_icon = ft.Icons.DANGEROUS
+                status_color = ft.Colors.RED
+                status_bg_color = ft.Colors.RED_50
+
 
             count_sup = 0
             for element in datas:
@@ -605,7 +606,18 @@ class ReportBook(ft.Container):
                         ft.DataCell(ft.Text(f"{item['points']}")),
                         ft.DataCell(ft.Text(f"{item['total_coefficient']}")),
                         ft.DataCell(ft.Text(f"{item['value']:.2f}")),
-                        ft.DataCell(status_icon),
+                        ft.DataCell(
+                            ft.Container(
+                                bgcolor=status_bg_color, padding=5, border_radius=16, width=100,
+                                border=ft.border.all(1, status_color),
+                                content=ft.Row(
+                                    controls=[
+                                        ft.Icon(status_icon, size=18, color=status_color),
+                                        ft.Text(status_text, size=12, font_family='PPM', color=status_color)
+                                    ], alignment=ft.MainAxisAlignment.CENTER, spacing=2
+                                )
+                            )
+                        ),
                         ft.DataCell(ft.Text(f"{rang}")),
                         ft.DataCell(
                             MyMiniIcon(
@@ -616,14 +628,6 @@ class ReportBook(ft.Container):
                     ]
                 )
             )
-
-        self.nb_success.value = add_separator(nb_success)
-        self.nb_fails.value = add_separator(nb_fails)
-
-        if nb_success / len(datas) < 1:
-            self.success_rate.value = f"{(nb_success * 100 / len(datas)):.2f} %"
-        else:
-            self.success_rate.value = f"{(nb_success * 100 / len(datas)):.0f} %"
 
         await self.build_main_view()
 
@@ -686,6 +690,18 @@ class ReportBook(ft.Container):
             )
 
         self.cp.page.update()
+
+    async def load_click_forward(self, e):
+        pass
+
+    async def load_click_back(self, e):
+        pass
+
+    def click_back(self, e):
+        self.run_async_in_thread(self.load_click_back(e))
+
+    def click_forward(self, e):
+        self.run_async_in_thread(self.load_click_forward(e))
 
     def on_search_change(self, e):
         self.run_async_in_thread(self.filter_datas(e))

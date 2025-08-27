@@ -58,13 +58,6 @@ class Users(ft.Container):
         self.main_window = ft.Container(
             expand=True, content=ft.Column(
                 expand=True, controls=[
-                    # Kpi..
-                    ft.Row(
-                        controls=[
-                            self.ct_nb_users,
-                            ft.VerticalDivider()
-                        ]
-                    ),
                     # datas...
                     ft.Row(
                         expand=True,
@@ -74,7 +67,8 @@ class Users(ft.Container):
                                 expand=True, bgcolor='white', content=ft.Column(
                                     controls=[
                                         ft.Container(
-                                            padding=20, content=ft.Row(
+                                            padding=20, border=ft.border.all(1, "#f0f0f6"),
+                                            content=ft.Row(
                                                 controls=[
                                                     ColoredButton(
                                                         languages[lang]['new user'], "person_add_outlined", self.open_new_user_window

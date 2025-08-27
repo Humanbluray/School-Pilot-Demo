@@ -44,7 +44,7 @@ drop_style: dict = dict(
 )
 datatable_style: dict = dict(
     data_text_style=ft.TextStyle(size=13, font_family='PPM', color='black87'),
-    heading_text_style=ft.TextStyle(size=12, font_family='PPM', color='grey'),
+    heading_text_style=ft.TextStyle(size=13, font_family='PPM', color='grey'),
     horizontal_lines=ft.BorderSide(width=0, color='white'),
 )
 
