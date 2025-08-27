@@ -15,8 +15,8 @@ class ItemMenu(ft.Container):
         self.my_icon_2 = my_icon_2
         self.is_clicked = False
 
-        self.visuel = ft.Icon(self.my_icon, size=24, color=ft.Colors.BLACK38)
-        self.visuel_2 = ft.Icon(self.my_icon_2, size=24, color='black', visible=False)
+        self.visuel = ft.Icon(self.my_icon, size=20, color=ft.Colors.BLACK38)
+        self.visuel_2 = ft.Icon(self.my_icon_2, size=20, color='black', visible=False)
         self.name = ft.Text(title.capitalize(), font_family="PPM", size=13, color=ft.Colors.BLACK87)
         self.name_2 = ft.Text(title.capitalize(), font_family="PPB", size=13, color='black', visible=False)
         self.content = ft.Row(

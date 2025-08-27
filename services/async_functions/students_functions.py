@@ -376,11 +376,11 @@ async def insert_discipline_entry(access_token: str, data: dict) -> dict:
     Insère une ligne dans la table 'discipline' à partir d’un dictionnaire de données.
     Le dictionnaire 'data' doit contenir les clés : year_id, student_id, type, quantity.
     """
-    request_url = f"{url}/rest/v1/discipline"
+    query_url = f"{url}/rest/v1/discipline"
 
     async with httpx.AsyncClient() as client:
         response = await client.post(
-            request_url,
+            query_url,
             headers={
                 "apikey": key,
                 "Authorization": f"Bearer {access_token}",

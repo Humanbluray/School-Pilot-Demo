@@ -31,7 +31,7 @@ class TabTeacher(ft.Tab):
         )
         self.year_id = get_current_year_id()
         self.search_prof = ft.Dropdown(
-            **drop_style, width=300, prefix_icon='person_outlined', label=languages[lang]['name'],
+            **drop_style, width=500, prefix_icon='person_outlined', label=languages[lang]['name'],
             on_change=self.on_search_change, menu_height=200
         )
         self.assign_button = MyButton(
@@ -46,26 +46,30 @@ class TabTeacher(ft.Tab):
         self.friday = ft.Column()
 
         self.main_window = ft.Container(
-            expand=True, padding=10,  # bgcolor='white',
-            content=ft.Column(
-                expand=True,
-                controls=[
-                    ft.Row(
-                        controls=[
-                            self.search_prof,
-                            self.prof_id
-                        ]
-                    ),
-                    ft.Column(
-                        expand=True, scroll=ft.ScrollMode.AUTO,
-                        controls=[
-                            ft.Row(
-                                expand=True, scroll=ft.ScrollMode.AUTO,
-                                controls=[self.monday, self.tuesday, self.wednesday, self.thursday, self.friday]
-                            )
-                        ]
-                    )
-                ]
+            expand=True, padding=10,
+            content=ft.Container(
+                expand=True, border_radius=16, padding=10,
+                content=ft.Column(
+                    expand=True,
+                    controls=[
+                        ft.Row(
+                            controls=[
+                                self.search_prof,
+                                self.prof_id
+                            ]
+                        ),
+                        ft.Divider(color=ft.Colors.TRANSPARENT),
+                        ft.Column(
+                            expand=True, scroll=ft.ScrollMode.AUTO,
+                            controls=[
+                                ft.Row(
+                                    expand=True, scroll=ft.ScrollMode.AUTO,
+                                    controls=[self.monday, self.tuesday, self.wednesday, self.thursday, self.friday]
+                                )
+                            ]
+                        )
+                    ]
+                )
             )
         )
 

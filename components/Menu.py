@@ -63,26 +63,26 @@ class NavBar(ft.Container):
                     expand=True,
                     controls=[
                         ft.Divider(height=1, color=ft.Colors.TRANSPARENT),
-                        ft.Row(
-                            controls=[
-                                ft.Container(
-                                    alignment=ft.alignment.center, width=40, height=40, bgcolor=BASE_COLOR,
-                                    border_radius=6,
-                                    content=ft.Icon('home', color="black", size=22)
-                                ),
-                                ft.Column(
-                                    controls=[
-                                        ft.Text('School Pilot', size=20, font_family='PPB', color='black'),
-                                        ft.Text('School management', size=11, font_family='PPM', color='grey')
-                                    ], spacing=0
-                                )
-                            ], alignment=ft.MainAxisAlignment.CENTER
-                        ),
-                        ft.Divider(height=1, color=ft.Colors.TRANSPARENT),
-                        ft.Row(
-                            [ft.Text('MENU', size=14, font_family='PPM'),],
-                            alignment=ft.MainAxisAlignment.CENTER
-                        ),
+                        # ft.Row(
+                        #     controls=[
+                        #         ft.Container(
+                        #             alignment=ft.alignment.center, width=40, height=40, bgcolor=BASE_COLOR,
+                        #             border_radius=6,
+                        #             content=ft.Icon('home', color="black", size=22)
+                        #         ),
+                        #         ft.Column(
+                        #             controls=[
+                        #                 ft.Text('School Pilot', size=20, font_family='PPB', color='black'),
+                        #                 ft.Text('School management', size=11, font_family='PPM', color='grey')
+                        #             ], spacing=0
+                        #         )
+                        #     ], alignment=ft.MainAxisAlignment.CENTER
+                        # ),
+                        # ft.Divider(height=1, color=ft.Colors.TRANSPARENT),
+                        # ft.Row(
+                        #     [ft.Text('MENU', size=14, font_family='PPM'),],
+                        #     alignment=ft.MainAxisAlignment.CENTER
+                        # ),
                         ft.Divider(height=1, thickness=1),
                         ft.Divider(height=2, color=ft.Colors.TRANSPARENT),
                         ft.Container(
@@ -97,24 +97,8 @@ class NavBar(ft.Container):
                             )
                         )
                     ]
-                ),
-                ft.Column(
-                    controls=[
-                        ft.Container(
-                            padding=10, alignment=ft.alignment.center,
-                            content=ft.Column(
-                                horizontal_alignment=ft.CrossAxisAlignment.CENTER,
-                                controls=[
-                                    ft.Divider(height=1, thickness=1),
-                                    ft.Text(
-                                        self.cp.current_year_label, size=12, font_family='PPM'
-                                    ),
-
-                                ]
-                            ),
-                        )
-                    ]
                 )
+
             ], alignment=ft.MainAxisAlignment.SPACE_BETWEEN
         )
 

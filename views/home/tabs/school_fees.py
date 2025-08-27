@@ -165,7 +165,7 @@ class SchoolFees(ft.Container):
                                 expand=True, bgcolor='white', content=ft.Column(
                                     controls=[
                                         ft.Container(
-                                            padding=20, border=ft.border.all(1, "#f0f0f6"),
+                                            padding=20, border=ft.border.only(bottom=ft.BorderSide(1, "#f0f0f6")),
                                             content=ft.Row(
                                                 controls=[
                                                     ft.Row(
