@@ -81,7 +81,7 @@ class Students(ft.Container):
                                     expand=True,
                                     controls=[
                                         ft.Container(
-                                            padding=20, border=ft.border.all(1, "#f0f0f6"),
+                                            padding=20, border=ft.border.only(bottom=ft.BorderSide(1, "#f0f0f6")),
                                             content=ft.Row(
                                                 controls=[
                                                     ft.Row(
@@ -1990,8 +1990,8 @@ class Students(ft.Container):
         self.sc_amount_paid.value = format_number(total_paid)
         self.sc_amount_due.value = format_number(total_due)
         self.sc_amount_expected.value =  format_number(total_to_pay)
-        self.sc_name.value = e.control.data['name']
-        self.sc_surname.value = e.control.data['surname']
+        self.sc_name.value = e.control.data['student_name']
+        self.sc_surname.value = e.control.data['student_surname']
 
         self.sc_payment_table.rows.clear()
         for payment in total_payments:
@@ -2172,8 +2172,9 @@ class Students(ft.Container):
                 'sequence': self.dis_sequence.value,
                 'type': self.dis_type.value,
                 'quantity': int(self.dis_qty.value),
-                "comment": self.dis_comment.value
+                "comments": self.dis_comment.value
             }
+
             await insert_discipline_entry(access_token, datas)
 
             self.cp.box.title.value = languages[self.lang]['success']

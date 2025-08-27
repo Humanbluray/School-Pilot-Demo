@@ -10,6 +10,7 @@ from utils.styles import cool_style
 
 user_infos_is_active = False
 menu_data_is_active = False
+SP_LOGO_URL = 'https://nppwkqytgqlqijpeulfj.supabase.co/storage/v1/object/public/logo_school_pilot/logo%20mini.png'
 
 
 class Home(ft.View):
@@ -52,17 +53,12 @@ class Home(ft.View):
             expand=True, controls=[
                 ft.Container(
                     alignment=ft.alignment.center, expand=True,
-                    content=ft.Image(src='/pictures/logo complet.png', width=500, height=500,)
+                    content=ft.Image(src=SP_LOGO_URL, width=500, height=500,)
                 )
             ]
         )
         self.current_year_label = get_current_year_label()
 
-        self.left_menu = ft.Container(
-            content=NavBar(self), width=220,  # border=ft.border.only(right=ft.BorderSide(1, 'grey')),
-            offset=ft.Offset(0, 0),
-            animate_offset=ft.Animation(300, ft.AnimationCurve.EASE_IN)
-        )
         self.active_quarter = ft.Text(size=12, font_family="PPM", color="teal")
         self.active_sequence = ft.Text(size=12, font_family="PPM", color="teal")
 
@@ -99,8 +95,49 @@ class Home(ft.View):
             )
         )
 
+        # Left menu ...
+        self.left_menu = ft.Container(
+            width=220,
+            content=ft.Column(
+                controls=[
+                    ft.Column(
+                        controls=[
+                            ft.Divider(height=1, color=ft.Colors.TRANSPARENT),
+                            ft.Row(
+                                controls=[
+                                    ft.Container(content=self.user_picture, on_click=self.open_user_container),
+                                    ft.Container(
+                                        bgcolor='#f0f0f6', alignment=ft.alignment.center, shape=ft.BoxShape.CIRCLE,
+                                        content=ft.Icon(ft.Icons.CALENDAR_MONTH_ROUNDED, color='black', size=20),
+                                        height=45,
+                                        padding=10,
+                                        on_click=self.open_data_container
+                                    ),
+                                    self.notifs_container,
+                                ], alignment=ft.MainAxisAlignment.CENTER
+                            ),
+                            NavBar(self),
+                        ]
+                    ),
+                    ft.Container(
+                        padding=10,
+                        content=ft.Column(
+                            horizontal_alignment=ft.CrossAxisAlignment.CENTER,
+                            controls=[
+                                ft.Divider(height=1, thickness=1),
+                                ft.Text(
+                                    "SCHOOL PILOT V1.0", size=12, font_family='PPM'
+                                ),
+                            ]
+                        )
+                    )
+                ], alignment=ft.MainAxisAlignment.SPACE_BETWEEN
+            )
+        )
+
+
         self.user_container = ft.Card(
-            elevation=20, shape=ft.RoundedRectangleBorder(radius=10), right=5, top=60,
+            elevation=20, shape=ft.RoundedRectangleBorder(radius=10), left=5, top=60,
             scale=ft.Scale(0), animate_scale=ft.Animation(100, ft.AnimationCurve.BOUNCE_OUT),
             content=ft.Container(
                 bgcolor='white', padding=20, border_radius=10, width=320, expand=True,
@@ -152,7 +189,7 @@ class Home(ft.View):
             )
         )
         self.data_container = ft.Card(
-            elevation=20, shape=ft.RoundedRectangleBorder(radius=10), right=5, top=60,
+            elevation=20, shape=ft.RoundedRectangleBorder(radius=10), left=5, top=60,
             scale=ft.Scale(0), animate_scale=ft.Animation(100, ft.AnimationCurve.BOUNCE_OUT),
             content=ft.Container(
                 bgcolor='white', padding=20, border_radius=10, width=300, expand=True,
@@ -296,7 +333,7 @@ class Home(ft.View):
         self.controls.clear()
         self.controls.append(
             ft.Container(
-                padding=10, expand=True, bgcolor='white',
+                expand=True, bgcolor='white',
                 content=ft.Stack(
                     expand=True,
                     controls=[
@@ -305,11 +342,10 @@ class Home(ft.View):
                             controls=[
                                 self.left_menu,
                                 ft.Container(
-                                    expand=True, bgcolor='#f0f0f6', border_radius=16,
+                                    expand=True, bgcolor='#f0f0f6', border_radius=16, padding=10,
                                     content=ft.Column(
                                         expand=True, spacing=0,
                                         controls=[
-                                            self.top_menu,
                                             ft.Container(
                                                 padding=20, expand=True, bgcolor='#f0f0f6',
                                                 content=self.my_content

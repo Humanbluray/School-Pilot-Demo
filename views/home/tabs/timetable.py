@@ -20,8 +20,7 @@ class Schedule(ft.Container):
                 expand=True,
                 controls=[
                     ft.Container(
-                        expand=True, border_radius=10, bgcolor='white',
-                        padding=20,
+                        expand=True, border_radius=10,
                         content=ft.Tabs(
                             tab_alignment=ft.TabAlignment.START, selected_index=0, expand=True, animation_duration=300,
                             unselected_label_color=ft.Colors.GREY, label_color='black',
