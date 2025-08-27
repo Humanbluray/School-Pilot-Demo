@@ -79,83 +79,84 @@ async def get_active_year_id(access_token) -> str:
         return data[0]['id'] if data else None
 
 
-async def get_students_with_details(access_token) -> List[dict]:
-    year_id = await get_active_year_id(access_token)
-    # print(year_id)
-    if not year_id:
-        return []
+async def get_students_with_details(page_number: int, access_token: str, year_id: str) -> List[dict]:
+    """
+    :param page_number:
+    :param access_token:
+    :param year_id:
+    :return:
+    """
+    decalage = page_number * 100
+    query_url = f"{url}/rest/v1/registrations_view"
+    params = {
+        "select": "*",
+        "limit": 100,
+        "offset": decalage,
+        "year_id": f"eq.{year_id}"
+    }
+    headers = {
+        "apikey": key,
+        "Authorization": f"Bearer {access_token}"
+    }
 
     async with httpx.AsyncClient() as client:
-        response = await client.get(
-            f"{url}/rest/v1/registrations",
-            params={
-                "select": "id,receipt_url,amount,student_id(id,name,surname,registration_number,image_url,gender),class_id(id,code),year_id(id,name)",
-                "year_id": f"eq.{year_id}"
-            },
-            headers={
-                "apikey": key,
-                "Authorization": f"Bearer {access_token}"
-            },
-        )
-        response.raise_for_status()
-        data = response.json()
+        response = await client.get(query_url, headers=headers, params=params)
 
-        return [
-            {
-                "registration_id": item["id"],
-                "receipt_url": item["receipt_url"],
-                "amount": item.get("amount"),
-                "student_id": item["student_id"]["id"] if item.get("student_id") else None,
-                "image_url": item["student_id"]["image_url"] if item.get("student_id") else None,
-                "gender": item["student_id"]["gender"] if item.get("student_id") else None,
-                "name": item["student_id"]["name"] if item.get("student_id") else None,
-                "surname": item["student_id"]["surname"] if item.get("student_id") else None,
-                "registration_number": item['student_id']['registration_number'] if item.get('student_id') else None,
-                "class_id": item["class_id"]["id"] if item.get("class_id") else None,
-                "class_code": item["class_id"]["code"] if item.get("class_id") else None,
-                "year_id": item["year_id"]["id"] if item.get("year_id") else None,
-                "year_name": item["year_id"]["name"] if item.get("year_id") else None,
-            }
-            for item in data
-        ]
+        if response.status_code != 200:
+            print("Erreur :", response.text)
+            return []
+
+        return response.json()
+
+
+async def get_students_with_details_wf(page_number: int, access_token: str, year_id: str,) -> List[dict]:
+    """
+
+    :param page_number:
+    :param access_token:
+    :param year_id:
+    :return:
+    """
+    decalage = page_number * 100
+    query_url = f"{url}/rest/v1/registrations_view"
+    params = {
+        "select": "*",
+        "limit": 5000,
+        "year_id": f"eq.{year_id}",
+    }
+    headers = {
+        "apikey": key,
+        "Authorization": f"Bearer {access_token}"
+    }
+
+    async with httpx.AsyncClient() as client:
+        response = await client.get(query_url, headers=headers, params=params)
+
+        if response.status_code != 200:
+            print("Erreur :", response.text)
+            return []
+
+        return response.json()
 
 
 async def get_unregistered_students(access_token: str) -> List[dict]:
-    # get active year
-    year_id = await get_active_year_id(access_token)
-    if not year_id:
-        return []
+    query_url = f"{url}/rest/v1/students_not_registered_active_year"
+    params = {
+        "select": "*",
+    }
+    headers = {
+        "apikey": key,
+        "Authorization": f"Bearer {access_token}"
+    }
 
-    # get ids of registered students
     async with httpx.AsyncClient() as client:
-        registrations_resp = await client.get(
-            f"{url}/rest/v1/registrations?year_id=eq.{year_id}&select=student_id",
-            headers={
-                "apikey": key,
-                "Authorization": f"Bearer {access_token}"
-            }
-        )
-        registrations_data = registrations_resp.json()
-        registered_ids = [item["student_id"] for item in registrations_data if item["student_id"]]
+        response = await client.get(query_url, headers=headers, params=params)
 
-    # if no student registered we take all of them
-    if not registered_ids:
-        query = f"{url}/rest/v1/students?select=id,name,surname"
-    else:
-        ids_str = ",".join(f'"{id}"' for id in registered_ids)  # Format pour Supabase `not.in`
-        query = f"{url}/rest/v1/students?select=id,name,surname&id=not.in.({ids_str})"
+        if response.status_code != 200:
+            print("Erreur :", response.text)
+            return []
 
-    # Étape 3 : récupérer les étudiants non inscrits
-    async with httpx.AsyncClient() as client:
-        response = await client.get(
-            query,
-            headers={
-                "apikey": key,
-                "Authorization": f"Bearer {access_token}"
-            }
-        )
-        data = response.json()
-        return data
+        return response.json()
 
 
 async def get_active_classes(access_token: str) -> list[dict]:

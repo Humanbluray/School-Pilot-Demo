@@ -127,52 +127,22 @@ class SchoolFees(ft.Container):
             **datatable_style, expand=True,
             columns=[
                 ft.DataColumn(
-                    ft.Row(
-                        controls=[
-                            ft.Icon('person_outlined', size=20, color='black45'),
-                            ft.Text(languages[lang]['name']),
-                        ]
-                    )
+                    ft.Text(languages[lang]['name']),
                 ),
                 ft.DataColumn(
-                    ft.Row(
-                        controls=[
-                            ft.Icon('roofing', size=20, color='black45'),
-                            ft.Text(languages[lang]['class']),
-                        ]
-                    )
+                    ft.Text(languages[lang]['class']),
                 ),
                 ft.DataColumn(
-                    ft.Row(
-                        controls=[
-                            ft.Icon(ft.Icons.ATTACH_MONEY, size=20, color='black45'),
-                            ft.Text(languages[lang]['amount paid']),
-                        ]
-                    )
+                    ft.Text(languages[lang]['amount paid']),
                 ),
                 ft.DataColumn(
-                    ft.Row(
-                        controls=[
-                            ft.Icon(ft.Icons.REAL_ESTATE_AGENT_OUTLINED, size=20, color='black45'),
-                            ft.Text(languages[lang]['total to pay']),
-                        ]
-                    )
+                    ft.Text(languages[lang]['total to pay']),
                 ),
                 ft.DataColumn(
-                    ft.Row(
-                        controls=[
-                            ft.Icon(ft.Icons.REAL_ESTATE_AGENT_OUTLINED, size=20, color='black45'),
-                            ft.Text(languages[lang]['remaining balance']),
-                        ]
-                    )
+                    ft.Text(languages[lang]['remaining balance']),
                 ),
                 ft.DataColumn(
-                    ft.Row(
-                        controls=[
-                            ft.Icon(ft.Icons.CHECK_BOX_OUTLINED, size=20, color='black45'),
-                            ft.Text(languages[lang]['status']),
-                        ]
-                    )
+                    ft.Text(languages[lang]['status']),
                 )
             ]
         )
@@ -195,10 +165,26 @@ class SchoolFees(ft.Container):
                                 expand=True, bgcolor='white', content=ft.Column(
                                     controls=[
                                         ft.Container(
-                                            padding=20, content=ft.Row(
+                                            padding=20, border=ft.border.all(1, "#f0f0f6"),
+                                            content=ft.Row(
                                                 controls=[
-                                                    ColoredButton(
-                                                        languages[lang]['make a payment'], ft.Icons.ADD_CARD_OUTLINED, None
+                                                    ft.Row(
+                                                        controls=[
+                                                            ColoredButton(
+                                                                languages[lang]['make a payment'],
+                                                                ft.Icons.ADD_CARD_OUTLINED, None
+                                                            ),
+                                                            ColoredButton(
+                                                                languages[lang]['pdf format'],
+                                                                ft.Icons.PICTURE_AS_PDF_SHARP,
+                                                                None
+                                                            ),
+                                                            ColoredButton(
+                                                                languages[lang]['xls format'],
+                                                                ft.Icons.FILE_PRESENT,
+                                                                None
+                                                            )
+                                                        ]
                                                     ),
                                                     ft.Row(
                                                         controls=[
@@ -219,36 +205,11 @@ class SchoolFees(ft.Container):
                                         ft.Divider(color=ft.Colors.TRANSPARENT),
                                         ft.ListView(expand=True, controls=[self.table]),
                                         ft.Container(
-                                            padding=20,
-                                            content=ft.Row(
-                                                controls=[
-                                                    ft.Text(languages[lang]['data extraction'].upper(), size=12,
-                                                            font_family='PPB'),
-                                                    ft.Row(
-                                                        controls=[
-                                                            ColoredButton(
-                                                                languages[lang]['pdf format'],
-                                                                ft.Icons.PICTURE_AS_PDF_SHARP,
-                                                                None
-                                                            ),
-                                                            ColoredButton(
-                                                                languages[lang]['xls format'],
-                                                                ft.Icons.FILE_PRESENT,
-                                                                None
-                                                            )
-                                                        ]
-                                                    )
-                                                ], alignment=ft.MainAxisAlignment.SPACE_BETWEEN
-                                            )
+                                            padding=10
                                         )
                                     ]
                                 )
                             ),
-                            ft.Column(
-                                controls=[
-
-                                ]
-                            )
                         ]
                     )
                 ]
@@ -267,13 +228,6 @@ class SchoolFees(ft.Container):
                 )
             ], alignment=ft.alignment.center
         )
-
-        # self.content = ft.Stack(
-        #     expand=True,
-        #     controls=[
-        #         self.main_window
-        #     ], alignment=ft.alignment.center
-        # )
         self.on_mount()
 
     async def build_main_view(self):

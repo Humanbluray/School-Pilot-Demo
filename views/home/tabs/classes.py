@@ -113,44 +113,19 @@ class Classes(ft.Container):
         self.table = ft.DataTable(
             **datatable_style, columns=[
                 ft.DataColumn(
-                    ft.Row(
-                        controls=[
-                            ft.Icon(ft.Icons.LABEL, size=20, color='black45'),
-                            ft.Text('Code')
-                        ]
-                    )
+                    ft.Text('Code')
                 ),
                 ft.DataColumn(
-                    ft.Row(
-                        controls=[
-                            ft.Icon(ft.Icons.CHECK_BOX_OUTLINED, size=20, color='black45'),
-                            ft.Text(languages[lang]['status'].capitalize())
-                        ]
-                    )
+                    ft.Text(languages[lang]['status'].capitalize())
                 ),
                 ft.DataColumn(
-                    ft.Row(
-                        controls=[
-                            ft.Icon(ft.Icons.GROUPS, size=20, color='black45'),
-                            ft.Text(languages[lang]['capacity'].capitalize())
-                        ]
-                    )
+                    ft.Text(languages[lang]['capacity'].capitalize())
                 ),
                 ft.DataColumn(
-                    ft.Row(
-                        controls=[
-                            ft.Icon(ft.Icons.GROUP, size=20, color='black45'),
-                            ft.Text(languages[lang]['head count'].capitalize())
-                        ]
-                    )
+                    ft.Text(languages[lang]['head count'].capitalize())
                 ),
                 ft.DataColumn(
-                    ft.Row(
-                        controls=[
-                            ft.Icon(ft.Icons.FORMAT_LIST_BULLETED_OUTLINED, size=20, color='black45'),
-                            ft.Text('Actions')
-                        ]
-                    )
+                    ft.Text('Actions')
                 ),
             ]
         )
@@ -160,17 +135,7 @@ class Classes(ft.Container):
             content=ft.Column(
                 expand=True,
                 controls=[
-                    ft.Container(
-                        content=ft.Row(
-                            [
-                                self.fill_rate_container,
-                                ft.VerticalDivider(color=ft.Colors.TRANSPARENT),
-                                self.max_cap_container,
-                                ft.VerticalDivider(color=ft.Colors.TRANSPARENT),
-                                self.cap_actu_container
-                            ]
-                        ),
-                    ),
+                    ft.Text('Classes'.capitalize(), size=16, font_family='PPB'),
                     ft.Row(
                         expand=True,
                         controls=[
@@ -182,38 +147,15 @@ class Classes(ft.Container):
                                     expand=True,
                                     controls=[
                                         ft.Container(
-                                            padding=20, content=ft.Row(
-                                                controls=[
-                                                    ft.Row(
-                                                        controls=[
-                                                            ColoredButton(
-                                                                languages[lang]['new class'], ft.Icons.ADD_HOME_OUTLINED,
-                                                                self.open_new_class_window
-                                                            )
-                                                        ]
-                                                    ),
-                                                    self.search
-
-                                                ], alignment=ft.MainAxisAlignment.SPACE_BETWEEN
-                                            ),
-                                        ),
-                                        ft.Divider(height=1, color=ft.Colors.TRANSPARENT),
-                                        ft.ListView(expand=True, controls=[self.table]),
-                                        ft.Container(
-                                            padding=20,
+                                            padding=20, border=ft.border.all(1, "#f0f0f6"),
                                             content=ft.Row(
                                                 controls=[
                                                     ft.Row(
                                                         controls=[
-                                                            ft.Icon(
-                                                                ft.Icons.DOWNLOAD_DONE, size=20, color="black87"
+                                                            ColoredButton(
+                                                                languages[lang]['new class'], ft.Icons.ADD_HOME,
+                                                                self.open_new_class_window
                                                             ),
-                                                            ft.Text(languages[lang]['data extraction'].upper(), size=12,
-                                                                    font_family='PPB'),
-                                                        ]
-                                                    ),
-                                                    ft.Row(
-                                                        controls=[
                                                             ColoredButton(
                                                                 languages[lang]['pdf format'],
                                                                 ft.Icons.PICTURE_AS_PDF_SHARP,
@@ -225,14 +167,31 @@ class Classes(ft.Container):
                                                                 None
                                                             )
                                                         ]
-                                                    )
+                                                    ),
+                                                    self.search
+
                                                 ], alignment=ft.MainAxisAlignment.SPACE_BETWEEN
-                                            )
+                                            ),
+                                        ),
+                                        ft.ListView(expand=True, controls=[self.table]),
+                                        ft.Container(
+                                            padding=10
+
                                         ),
                                     ]
                                 )
                             ),
+                            ft.Container(
+                                content=ft.Column(
+                                    [
+                                        self.fill_rate_container,
+                                        self.max_cap_container,
+                                        self.cap_actu_container
+                                    ]
+                                ),
+                            ),
                             ft.Column(
+                                visible=False,
                                 controls=[
                                     self.anglo_franco_container
                                 ]
@@ -245,14 +204,14 @@ class Classes(ft.Container):
 
         # new class window _______________________________________________________________________________
         self.new_code = ft.TextField(
-            **login_style, prefix_icon=ft.Icons.ROOFING, width=170
+            **login_style, prefix_icon=ft.Icons.ROOFING, expand=True
         )
         self.new_level = ft.Dropdown(
-            **drop_style, prefix_icon=ft.Icons.ACCOUNT_BALANCE_OUTLINED, width=200,
+            **drop_style, prefix_icon=ft.Icons.ACCOUNT_BALANCE_OUTLINED, expand=True,
             menu_height=200
         )
         self.new_capacity = ft.TextField(
-            **login_style, prefix_icon=ft.Icons.GROUPS_3_OUTLINED, width=150,
+            **login_style, prefix_icon=ft.Icons.GROUPS_3_OUTLINED, expand=True,
             text_align=ft.TextAlign.RIGHT, input_filter=ft.NumbersOnlyInputFilter()
         )
         self.new_progression_text = ft.Text("0 %", size=13, font_family="PPB", color='white')
@@ -261,18 +220,18 @@ class Classes(ft.Container):
             content=ft.Row([self.new_progression_text], alignment=ft.MainAxisAlignment.CENTER)
         )
         self.new_bar = ft.ProgressBar(
-            width=200, height=10, border_radius=10, color=ft.Colors.LIGHT_GREEN, bgcolor='#f0f0f6', value=0,
+            height=7, border_radius=16, color=BASE_COLOR, bgcolor=SECOND_COLOR, value=0,
             expand=True
         )
         self.new_check = ft.Icon(
-            'check_circle', color=ft.Colors.LIGHT_GREEN, size=24,
+            'check_circle', color=BASE_COLOR, size=24,
             scale=ft.Scale(0), animate_scale=ft.Animation(300, ft.AnimationCurve.EASE_IN)
         )
         self.new_class_window = ft.Card(
             elevation=50, shape=ft.RoundedRectangleBorder(radius=16), expand=True,
             scale=ft.Scale(0), animate_scale=ft.Animation(300, ft.AnimationCurve.EASE_IN),
             content=ft.Container(
-                bgcolor=CT_BGCOLOR, padding=0, border_radius=16,  width=500, height=470, expand=True,
+                bgcolor=CT_BGCOLOR, padding=0, border_radius=16,  width=400, height=480, expand=True,
                 content=ft.Column(
                     controls=[
                         ft.Container(
@@ -280,7 +239,12 @@ class Classes(ft.Container):
                             border_radius=ft.border_radius.only(top_left=16, top_right=16),
                             content=ft.Row(
                                 controls=[
-                                    ft.Text(languages[lang]['new class'], size=16, font_family='PPB'),
+                                    ft.Row(
+                                        controls=[
+                                            ft.Icon('add_home', size=24, color='black'),
+                                            ft.Text(languages[lang]['new class'], size=16, font_family='PPB'),
+                                        ]
+                                    ),
                                     ft.IconButton(
                                         'close', icon_color='black87', bgcolor='#f0f0f6', scale=0.7,
                                         on_click=self.close_new_class_window
@@ -290,7 +254,7 @@ class Classes(ft.Container):
                         ),
                         ft.Container(
                             bgcolor="white", padding=20, border=ft.border.only(top=ft.BorderSide(1, CT_BORDER_COLOR)),
-                            border_radius=ft.border_radius.only(bottom_left=16, bottom_right=16),
+                            border_radius=ft.border_radius.only(bottom_left=16, bottom_right=16), expand=True,
                             content=ft.Column(
                                 controls=[
                                     ft.Column(
@@ -312,17 +276,21 @@ class Classes(ft.Container):
                                         ], spacing=2
                                     ),
                                     ft.Divider(height=1, color=ft.Colors.TRANSPARENT),
-                                    ft.Divider(height=1, thickness=1),
-                                    ft.Text(languages[lang]['slots generation'], size=12, font_family='PPI', color='black54'),
+                                    ft.Column(
+                                        spacing=0, controls=[
+                                            ft.Text(languages[lang]['slots generation'].upper(), size=13, font_family='PPB',
+                                                    color='black'),
+                                            ft.Divider(height=1, thickness=1),
+                                        ]
+                                    ),
                                     ft.Container(
-                                        alignment=ft.alignment.center,
+                                        alignment=ft.alignment.center, padding=10,
                                         content=ft.Row(
                                             controls=[
                                                 self.new_bar, self.new_check, self.new_progression_container
                                             ]
                                         )
                                     ),
-                                    # ft.Divider(height=1, thickness=1),
                                     ft.Divider(height=1, color=ft.Colors.TRANSPARENT),
                                     ft.Row(
                                         [MyButton(languages[lang]['valid'], 'check', 180, self.add_new_class)]
@@ -370,7 +338,7 @@ class Classes(ft.Container):
                 content=ft.Column(
                     controls=[
                         ft.Container(
-                            bgcolor="black", padding=20, border=ft.border.only(bottom=ft.BorderSide(1, CT_BORDER_COLOR)),
+                            bgcolor="white", padding=20, border=ft.border.only(bottom=ft.BorderSide(1, CT_BORDER_COLOR)),
                             border_radius=ft.border_radius.only(top_left=16, top_right=16),
                             content=ft.Row(
                                 controls=[
@@ -520,9 +488,9 @@ class Classes(ft.Container):
         self.cp.left_menu.disabled = True
         self.cp.top_menu.disabled = True
         self.main_window.disabled = True
-        self.cp.left_menu.opacity = 0.3
-        self.cp.top_menu.opacity = 0.3
-        self.main_window.opacity = 0.3
+        self.cp.left_menu.opacity = 0.1
+        self.cp.top_menu.opacity = 0.1
+        self.main_window.opacity = 0.1
         self.cp.page.update()
 
     @staticmethod
@@ -614,7 +582,7 @@ class Classes(ft.Container):
                         ),
                         ft.DataCell(ft.Text(detail['student_count'])),
                         ft.DataCell(ft.Text(detail['capacity'])),
-                        ft.DataCell(MyMiniIcon('edit_outlined', '', 'grey', detail, self.show_class_details), )
+                        ft.DataCell(MyMiniIcon('edit_outlined', '', 'blue', detail, self.show_class_details), )
                     ]
                 )
             )
@@ -663,7 +631,7 @@ class Classes(ft.Container):
                         ),
                         ft.DataCell(ft.Text(detail['student_count'])),
                         ft.DataCell(ft.Text(detail['capacity'])),
-                        ft.DataCell(MyMiniIcon('edit_outlined', '', 'grey', detail, self.show_class_details), )
+                        ft.DataCell(MyMiniIcon('edit_outlined', '', 'blue', detail, self.show_class_details), )
                     ]
                 )
             )
@@ -688,6 +656,7 @@ class Classes(ft.Container):
             self.cp.box.update()
 
     def close_new_class_window(self, e):
+        self.new_bar.value = 0
         self.hide_one_window(self.new_class_window)
 
     def add_new_class(self, e):
@@ -797,7 +766,7 @@ class Classes(ft.Container):
                     cells=[
                         ft.DataCell(ft.Text(languages[self.lang][slot['day']])),
                         ft.DataCell(ft.Text(slot['slot'])),
-                        ft.DataCell(ft.Text(slot['teacher_name'])),
+                        ft.DataCell(ft.Text(slot['teacher_name'].upper())),
                         ft.DataCell(ft.Text(slot['short_name']))
                     ]
                 )

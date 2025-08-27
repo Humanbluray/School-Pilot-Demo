@@ -24,7 +24,7 @@ class Teachers(ft.Container):
 
         # Main window __________________________________________________________________________
         self.search = ft.TextField(
-            **cool_style, prefix_icon="search", label=languages[lang]['search'], width=300,
+            **cool_style, prefix_icon="search", width=300,
             on_change=self.on_search_change
         )
         self.table = ft.DataTable(
@@ -32,44 +32,19 @@ class Teachers(ft.Container):
             columns=[
                 ft.DataColumn(ft.Text('')),
                 ft.DataColumn(
-                    ft.Row(
-                        [
-                            ft.Icon('person', size=20, color='black45'),
-                            ft.Text(languages[lang]['name'].capitalize())
-                        ]
-                    )
+                    ft.Text(languages[lang]['name'].capitalize())
                 ),
                 ft.DataColumn(
-                    ft.Row(
-                        [
-                            ft.Icon('wc', size=20, color='black45'),
-                            ft.Text(languages[lang]['gender'].capitalize())
-                        ]
-                    )
+                    ft.Text(languages[lang]['gender'].capitalize())
                 ),
                 ft.DataColumn(
-                    ft.Row(
-                        [
-                            ft.Icon('phone_android', size=20, color='black45'),
-                            ft.Text(languages[lang]['contact'].capitalize())
-                        ]
-                    )
+                    ft.Text(languages[lang]['contact'].capitalize())
                 ),
                 ft.DataColumn(
-                    ft.Row(
-                        [
-                            ft.Icon(ft.Icons.ATTACH_MONEY, size=20, color='black45'),
-                            ft.Text(languages[lang]['hourly pay'].capitalize())
-                        ]
-                    )
+                    ft.Text(languages[lang]['hourly pay'].capitalize())
                 ),
                 ft.DataColumn(
-                    ft.Row(
-                        [
-                            ft.Icon(ft.Icons.FORMAT_LIST_BULLETED_SHARP, size=20, color='black45'),
-                            ft.Text('Actions')
-                        ]
-                    )
+                    ft.Text('Actions')
                 ),
             ]
         )
@@ -86,108 +61,7 @@ class Teachers(ft.Container):
             expand=True, content=ft.Column(
                 expand=True,
                 controls=[
-                    # KPI...
-                    ft.Row(
-                        controls=[
-                            ft.Container(
-                                width=170, height=120, padding=10, border_radius=24, border=ft.border.all(1, 'white'),
-                                bgcolor='white',
-                                content=ft.Column(
-                                    controls=[
-                                        ft.Row(
-                                            controls=[
-                                                ColoredIcon(ft.Icons.PIE_CHART_SHARP, 'indigo', 'indigo50'),
-                                                ft.Text(languages[lang]['teachers'].upper(), size=12,
-                                                        font_family='PPI',
-                                                        color='indigo')
-                                            ], alignment=ft.MainAxisAlignment.START
-                                        ),
-                                        ft.Column(
-                                            controls=[
-                                                self.nb_teachers,
-                                                ft.Text(languages[lang]['nb teachers'], size=11, font_family='PPI',
-                                                        color='grey')
-                                            ], spacing=0
-                                        )
-                                    ], horizontal_alignment=ft.CrossAxisAlignment.CENTER
-                                )
-                            ),
-                            ft.VerticalDivider(color=ft.Colors.TRANSPARENT),
-                            ft.Container(
-                                width=170, height=120, padding=10, border_radius=24, border=ft.border.all(1, 'white'),
-                                bgcolor='white',
-                                content=ft.Column(
-                                    controls=[
-                                        ft.Row(
-                                            controls=[
-                                                ColoredIcon(ft.Icons.PIE_CHART_SHARP, 'teal', 'teal50'),
-                                                ft.Text(languages[lang]['rate'].upper(), size=12,
-                                                        font_family='PPI',
-                                                        color='teal')
-                                            ], alignment=ft.MainAxisAlignment.START
-                                        ),
-                                        ft.Column(
-                                            controls=[
-                                                self.rate_per_hours,
-                                                ft.Text(languages[lang]['rate per hour'], size=11, font_family='PPI',
-                                                        color='grey')
-                                            ], spacing=0
-                                        )
-                                    ], horizontal_alignment=ft.CrossAxisAlignment.CENTER
-                                )
-                            ),
-                            ft.VerticalDivider(color=ft.Colors.TRANSPARENT),
-                            ft.Container(
-                                width=170, height=120, padding=10, border_radius=24, border=ft.border.all(1, 'white'),
-                                bgcolor='white',
-                                content=ft.Column(
-                                    controls=[
-                                        ft.Row(
-                                            controls=[
-                                                ColoredIcon(ft.Icons.PIE_CHART_SHARP, 'deeporange', 'deeporange50'),
-                                                ft.Text(languages[lang]['hours'].upper(), size=12,
-                                                        font_family='PPI',
-                                                        color='deeporange')
-                                            ], alignment=ft.MainAxisAlignment.START
-                                        ),
-                                        ft.Column(
-                                            controls=[
-                                                self.nb_hours_affected,
-                                                ft.Text(languages[lang]['nb hours affected'], size=11, font_family='PPI',
-                                                        color='grey')
-                                            ], spacing=0
-                                        )
-                                    ], horizontal_alignment=ft.CrossAxisAlignment.CENTER
-                                )
-                            ),
-                            ft.VerticalDivider(color=ft.Colors.TRANSPARENT),
-                            ft.Container(
-                                width=170, height=120, padding=10, border_radius=24, border=ft.border.all(1, 'white'),
-                                bgcolor='white',
-                                content=ft.Column(
-                                    controls=[
-                                        ft.Row(
-                                            controls=[
-                                                ColoredIcon(ft.Icons.PIE_CHART_SHARP, 'green', 'green50'),
-                                                ft.Text(languages[lang]['total'].upper(), size=12,
-                                                        font_family='PPI',
-                                                        color='green')
-                                            ], alignment=ft.MainAxisAlignment.START
-                                        ),
-                                        ft.Column(
-                                            controls=[
-                                                self.cost_per_hours,
-                                                ft.Text(languages[lang]['cost per week'], size=11,
-                                                        font_family='PPI',
-                                                        color='grey')
-                                            ], spacing=0
-                                        )
-                                    ], horizontal_alignment=ft.CrossAxisAlignment.CENTER
-                                )
-                            ),
-
-                        ],
-                    ),
+                    ft.Text(languages[lang]['teachers'].capitalize(), size=16, font_family='PPB'),
                     ft.Row(
                         expand=True,
                         controls=[
@@ -198,53 +72,19 @@ class Teachers(ft.Container):
                                     expand=True,
                                     controls=[
                                         ft.Container(
-                                            padding=20, content=ft.Row(
-                                                controls=[
-                                                    ft.Row(
-                                                        controls=[
-                                                            ColoredButton(
-                                                                languages[lang]['new teacher'], 'person_add_outlined',
-                                                                self.open_new_teacher_window
-                                                            ),
-                                                            ColoredButton(
-                                                                languages[lang]['assign head'], 'person_add_outlined',
-                                                                self.open_head_teacher_window
-                                                            ),
-                                                        ]
-                                                    ),
-                                                    ft.Row(
-                                                        controls=[
-                                                            ft.Row(
-                                                                controls=[
-                                                                    self.search,
-                                                                    ColoredIconButton(
-                                                                        ft.Icons.FILTER_ALT_OFF_OUTLINED, '', 'black', 'grey50',
-                                                                        self.filter_datas
-                                                                    ),
-                                                                ]
-                                                            ),
-                                                        ], alignment=ft.MainAxisAlignment.SPACE_BETWEEN
-                                                    )
-                                                ], alignment=ft.MainAxisAlignment.SPACE_BETWEEN
-                                            ),
-                                        ),
-                                        ft.Divider(color=ft.Colors.TRANSPARENT, height=1),
-                                        ft.ListView(expand=True, controls=[self.table]),
-                                        ft.Container(
-                                            padding=20,
+                                            padding=20, border=ft.border.all(1, "#f0f0f6"),
                                             content=ft.Row(
                                                 controls=[
                                                     ft.Row(
                                                         controls=[
-                                                            ft.Icon(
-                                                                ft.Icons.DOWNLOAD_DONE, size=20, color="black87"
+                                                            ColoredButton(
+                                                                languages[lang]['new teacher'], 'person_add',
+                                                                self.open_new_teacher_window
                                                             ),
-                                                            ft.Text(languages[lang]['data extraction'].upper(), size=12,
-                                                                    font_family='PPB'),
-                                                        ]
-                                                    ),
-                                                    ft.Row(
-                                                        controls=[
+                                                            ColoredButton(
+                                                                languages[lang]['assign head'], 'assignment_ind',
+                                                                self.open_head_teacher_window
+                                                            ),
                                                             ColoredButton(
                                                                 languages[lang]['pdf format'],
                                                                 ft.Icons.PICTURE_AS_PDF_SHARP,
@@ -256,9 +96,16 @@ class Teachers(ft.Container):
                                                                 None
                                                             )
                                                         ]
-                                                    )
+                                                    ),
+                                                    self.search,
                                                 ], alignment=ft.MainAxisAlignment.SPACE_BETWEEN
-                                            )
+                                            ),
+                                        ),
+                                        ft.Divider(color=ft.Colors.TRANSPARENT, height=1),
+                                        ft.ListView(expand=True, controls=[self.table]),
+                                        ft.Container(
+                                            padding=10
+
                                         ),
                                     ]
                                 )
@@ -266,36 +113,112 @@ class Teachers(ft.Container):
                             ft.Column(
                                 controls=[
                                     ft.Container(
-                                        padding=15, border_radius=16, border=ft.border.all(1, 'white'),
+                                        width=170, height=120, padding=10, border_radius=24,
+                                        border=ft.border.all(1, 'white'),
                                         bgcolor='white',
                                         content=ft.Column(
                                             controls=[
                                                 ft.Row(
                                                     controls=[
-                                                        ft.Icon(
-                                                            ft.Icons.DOWNLOAD_DONE, size=20, color="black87"
-                                                        ),
-                                                        ft.Text(languages[lang]['data extraction'].upper(), size=12,
-                                                                font_family='PPB'),
-                                                    ]
+                                                        ColoredIcon(ft.Icons.PIE_CHART_SHARP, 'indigo', 'indigo50'),
+                                                        ft.Text(languages[lang]['teachers'].upper(), size=12,
+                                                                font_family='PPI',
+                                                                color='indigo')
+                                                    ], alignment=ft.MainAxisAlignment.START
                                                 ),
+                                                ft.Column(
+                                                    controls=[
+                                                        self.nb_teachers,
+                                                        ft.Text(languages[lang]['nb teachers'], size=11,
+                                                                font_family='PPI',
+                                                                color='grey')
+                                                    ], spacing=0
+                                                )
+                                            ], horizontal_alignment=ft.CrossAxisAlignment.CENTER
+                                        )
+                                    ),
+                                    ft.VerticalDivider(color=ft.Colors.TRANSPARENT),
+                                    ft.Container(
+                                        width=170, height=120, padding=10, border_radius=24,
+                                        border=ft.border.all(1, 'white'),
+                                        bgcolor='white',
+                                        content=ft.Column(
+                                            controls=[
                                                 ft.Row(
                                                     controls=[
-                                                        ColoredButton(
-                                                            languages[lang]['pdf format'],
-                                                            ft.Icons.PICTURE_AS_PDF_SHARP, None
-                                                        ),
-                                                        ColoredButton(
-                                                            languages[lang]['xls format'],
-                                                            ft.Icons.FILE_PRESENT, None
-                                                        )
-                                                    ]
+                                                        ColoredIcon(ft.Icons.PIE_CHART_SHARP, 'teal', 'teal50'),
+                                                        ft.Text(languages[lang]['rate'].upper(), size=12,
+                                                                font_family='PPI',
+                                                                color='teal')
+                                                    ], alignment=ft.MainAxisAlignment.START
+                                                ),
+                                                ft.Column(
+                                                    controls=[
+                                                        self.rate_per_hours,
+                                                        ft.Text(languages[lang]['rate per hour'], size=11,
+                                                                font_family='PPI',
+                                                                color='grey')
+                                                    ], spacing=0
                                                 )
-                                            ]
+                                            ], horizontal_alignment=ft.CrossAxisAlignment.CENTER
                                         )
-                                    )
-                                ]
-                            )
+                                    ),
+                                    ft.VerticalDivider(color=ft.Colors.TRANSPARENT),
+                                    ft.Container(
+                                        width=170, height=120, padding=10, border_radius=24,
+                                        border=ft.border.all(1, 'white'),
+                                        bgcolor='white',
+                                        content=ft.Column(
+                                            controls=[
+                                                ft.Row(
+                                                    controls=[
+                                                        ColoredIcon(ft.Icons.PIE_CHART_SHARP, 'deeporange',
+                                                                    'deeporange50'),
+                                                        ft.Text(languages[lang]['hours'].upper(), size=12,
+                                                                font_family='PPI',
+                                                                color='deeporange')
+                                                    ], alignment=ft.MainAxisAlignment.START
+                                                ),
+                                                ft.Column(
+                                                    controls=[
+                                                        self.nb_hours_affected,
+                                                        ft.Text(languages[lang]['nb hours affected'], size=11,
+                                                                font_family='PPI',
+                                                                color='grey')
+                                                    ], spacing=0
+                                                )
+                                            ], horizontal_alignment=ft.CrossAxisAlignment.CENTER
+                                        )
+                                    ),
+                                    ft.VerticalDivider(color=ft.Colors.TRANSPARENT),
+                                    ft.Container(
+                                        width=170, height=120, padding=10, border_radius=24,
+                                        border=ft.border.all(1, 'white'),
+                                        bgcolor='white',
+                                        content=ft.Column(
+                                            controls=[
+                                                ft.Row(
+                                                    controls=[
+                                                        ColoredIcon(ft.Icons.PIE_CHART_SHARP, 'green', 'green50'),
+                                                        ft.Text(languages[lang]['total'].upper(), size=12,
+                                                                font_family='PPI',
+                                                                color='green')
+                                                    ], alignment=ft.MainAxisAlignment.START
+                                                ),
+                                                ft.Column(
+                                                    controls=[
+                                                        self.cost_per_hours,
+                                                        ft.Text(languages[lang]['cost per week'], size=11,
+                                                                font_family='PPI',
+                                                                color='grey')
+                                                    ], spacing=0
+                                                )
+                                            ], horizontal_alignment=ft.CrossAxisAlignment.CENTER
+                                        )
+                                    ),
+
+                                ],
+                            ),
                         ]
                     ),
                 ]
@@ -484,7 +407,12 @@ class Teachers(ft.Container):
                             border_radius=ft.border_radius.only(top_left=8, top_right=8),
                             content=ft.Row(
                                 controls=[
-                                    ft.Text(languages[lang]['schedule'], size=16, font_family='PPB'),
+                                    ft.Row(
+                                        controls=[
+                                            ft.Icon(ft.Icons.CALENDAR_MONTH, size=24, color='black'),
+                                            ft.Text(languages[lang]['schedule'], size=16, font_family='PPB'),
+                                        ]
+                                    ),
                                     ft.IconButton(
                                         'close', icon_color='black87', bgcolor=CT_BGCOLOR, scale=0.7,
                                         on_click=self.close_schedule_window
@@ -543,10 +471,10 @@ class Teachers(ft.Container):
         # edit teacher window___________________________________________
         self.edit_uid = ft.TextField(**cool_style, width=400, prefix_icon='credit_card', visible=False)
         self.edit_name = ft.TextField(
-            **cool_style, prefix_icon="person_outlined", width=300,
+            **cool_style, prefix_icon="person_outlined", width=350,
         )
         self.edit_surname = ft.TextField(
-            **cool_style, prefix_icon="person_outlined", width=300,
+            **cool_style, prefix_icon="person_outlined", width=350,
         )
         self.edit_gender = ft.TextField(
             **cool_style, prefix_icon='wc', width=100,
@@ -560,7 +488,7 @@ class Teachers(ft.Container):
             input_filter=ft.NumbersOnlyInputFilter()
         )
         self.edit_subject = ft.TextField(
-            **cool_style, width=400, prefix_icon=ft.Icons.BOOK_OUTLINED
+            **cool_style, expand=True, prefix_icon=ft.Icons.BOOK_OUTLINED
         )
         self.edit_select_subjects = ft.GridView(
             expand=True,
@@ -689,12 +617,12 @@ class Teachers(ft.Container):
             )
         )
         self.head_teacher_name = ft.Dropdown(
-            **drop_style, width=300, prefix_icon='person_outlined',
+            **drop_style, expand=True, prefix_icon='person_outlined',
             options=[ft.dropdown.Option(key=' ', text=languages[lang]['select option'])],
             menu_height=200, value=' '
         )
         self.head_class_name = ft.Dropdown(
-            **drop_style, width=170, prefix_icon='roofing',
+            **drop_style, expand=True, prefix_icon='roofing',
             options=[ft.dropdown.Option(key=' ', text=languages[lang]['select option'])],
             menu_height=200, value=' '
         )
@@ -711,7 +639,12 @@ class Teachers(ft.Container):
                             border_radius=ft.border_radius.only(top_left=8, top_right=8),
                             content=ft.Row(
                                 controls=[
-                                    ft.Text(languages[lang]['assign head'], size=16, font_family='PPB'),
+                                    ft.Row(
+                                        controls=[
+                                            ft.Icon(ft.Icons.ASSIGNMENT_IND, size=24, color='black'),
+                                            ft.Text(languages[lang]['assign head'], size=16, font_family='PPB'),
+                                        ]
+                                    ),
                                     ft.IconButton(
                                         'close', icon_color='black87', bgcolor=CT_BGCOLOR, scale=0.7,
                                         on_click=self.close_head_teacher_window
@@ -742,7 +675,7 @@ class Teachers(ft.Container):
                                         content=ft.Row(
                                             [
                                                 MyButton(
-                                                    languages[lang]['valid'], 'check_circle', 180,
+                                                    languages[lang]['valid'], 'check_circle', 330,
                                                     self.valid_assignment
                                                 )
                                             ]

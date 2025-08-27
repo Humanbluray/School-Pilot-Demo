@@ -355,7 +355,8 @@
         "year": "année",
         "yyyy": "AAAA",
         "school year": "année scolaire",
-        "students table": "table des élèves"
+        "students table": "table des élèves",
+        "failure": "échec"
     },
     "en": {
         "1- new school year": "1- new school year",
@@ -713,6 +714,7 @@
         "year": "year",
         "yyyy": "YYYY",
         "school year": "school year",
-        "students table": "students table"
+        "students table": "students table",
+        "failure": "failure"
     }
 }

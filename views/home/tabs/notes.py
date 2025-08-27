@@ -9,45 +9,37 @@ from services.async_functions.notes_functions import *
 from utils.useful_functions import add_separator
 
 DOCUMENTS_BUCKET = 'documents'
+page_number: int = 1
 
 
 class Notes(ft.Container):
     def __init__(self, cp: object):
         super().__init__(
-            expand=True
+            expand=True, alignment=ft.alignment.center
         )
         # parent container (Home) ___________________________________________________________
         self.cp = cp
         lang = self.cp.language
         self.lang = lang
 
-        # kpi ___________________________________________________________
-        self.nb_notes = ft.Text('-', size=28, font_family='PPM', weight=ft.FontWeight.BOLD)
-        self.nb_notes_supp = ft.Text('-', size=28, font_family='PPM', weight=ft.FontWeight.BOLD)
-        self.note_supp_rate = ft.Text('-', size=28, font_family='PPM', weight=ft.FontWeight.BOLD)
-
-
         # main window _______________________________________________________
-        self.search_student = ft.TextField(
-            **cool_style, prefix_icon='person_outlined', width=400,
-        )
         self.search_class = ft.Dropdown(
             **drop_style,
-            prefix_icon=ft.Icons.ROOFING, width=200, menu_height=200,
+            prefix_icon=ft.Icons.ROOFING, expand=True, menu_height=200,
             on_change=self.on_filter_class_change, options=[
                 ft.dropdown.Option(key=' ', text=f"{languages[lang]['select option']}")
             ], value=' ',
         )
         self.search_subject = ft.Dropdown(
             **drop_style,
-            prefix_icon=ft.Icons.BOOK_OUTLINED, width=400, menu_height=200,
+            prefix_icon=ft.Icons.BOOK_OUTLINED, expand=True, menu_height=200,
             on_change=None, options=[
                 ft.dropdown.Option(key=' ', text=f"{languages[lang]['select option']}")
             ], value=' '
         )
         self.search_sequence = ft.Dropdown(
             **drop_style,
-            prefix_icon=ft.Icons.BOOK_OUTLINED, width=200, menu_height=200,
+            prefix_icon=ft.Icons.BOOK_OUTLINED, expand=True, menu_height=200,
             options=[
                 ft.dropdown.Option(
                     key='sequence 1', text=f"{languages[lang]['sequence 1']}"
@@ -77,92 +69,28 @@ class Notes(ft.Container):
                 ]
             ]
         )
+        self.nb_result_search = ft.Text(size=12, font_family="PPI", color='grey')
+        self.page_number = ft.Text(f"{page_number}", size=12, font_family='PPM')
+        self.back_bt = ft.IconButton(
+            ft.Icons.ARROW_CIRCLE_LEFT_OUTLINED, icon_size=20, icon_color="black", bgcolor="#f0f0f6",
+            on_click=self.click_back
+        )
+        self.forward_bt = ft.IconButton(
+            ft.Icons.ARROW_CIRCLE_RIGHT_OUTLINED, icon_size=20, icon_color="black", bgcolor="#f0f0f6",
+            on_click=self.click_forward
+        )
 
         self.main_window = ft.Container(
             expand=True, content=ft.Column(
                 controls=[
-                    # kpi...
-                    ft.Row(
-                        controls=[
-                            ft.Container(
-                                width=170, height=120, padding=10, border_radius=24, border=ft.border.all(1, 'white'),
-                                bgcolor='white',
-                                content=ft.Column(
-                                    controls=[
-                                        ft.Row(
-                                            controls=[
-                                                ColoredIcon(ft.Icons.PIE_CHART_SHARP, 'indigo', 'indigo50'),
-                                                ft.Text(languages[lang]['notes'].upper(), size=12,
-                                                        font_family='PPI',
-                                                        color='indigo')
-                                            ], alignment=ft.MainAxisAlignment.START
-                                        ),
-                                        ft.Column(
-                                            controls=[
-                                                self.nb_notes,
-                                                ft.Text(languages[lang]['nb notes'], size=11, font_family='PPI',
-                                                        color='grey')
-                                            ], spacing=0
-                                        )
-                                    ], horizontal_alignment=ft.CrossAxisAlignment.CENTER
-                                )
-                            ),
-                            ft.VerticalDivider(color=ft.Colors.TRANSPARENT),
-                            ft.Container(
-                                width=170, height=120, padding=10, border_radius=24, border=ft.border.all(1, 'white'),
-                                bgcolor='white',
-                                content=ft.Column(
-                                    controls=[
-                                        ft.Row(
-                                            controls=[
-                                                ColoredIcon(ft.Icons.PIE_CHART_SHARP, 'teal', 'teal50'),
-                                                ft.Text(languages[lang]['nb > 10'].upper(), size=12,
-                                                        font_family='PPI',
-                                                        color='teal')
-                                            ], alignment=ft.MainAxisAlignment.START
-                                        ),
-                                        ft.Column(
-                                            controls=[
-                                                self.nb_notes_supp,
-                                                ft.Text(languages[lang]['nb > 10'], size=11, font_family='PPI',
-                                                        color='grey')
-                                            ], spacing=0
-                                        )
-                                    ], horizontal_alignment=ft.CrossAxisAlignment.CENTER
-                                )
-                            ),
-                            ft.VerticalDivider(color=ft.Colors.TRANSPARENT),
-                            ft.Container(
-                                width=170, height=120, padding=10, border_radius=24, border=ft.border.all(1, 'white'),
-                                bgcolor='white',
-                                content=ft.Column(
-                                    controls=[
-                                        ft.Row(
-                                            controls=[
-                                                ColoredIcon(ft.Icons.BAR_CHART_ROUNDED, 'deeporange', 'deeporange50'),
-                                                ft.Text(languages[lang]['rate > 10'].upper(), size=12,
-                                                        font_family='PPI',
-                                                        color='deeporange')
-                                            ], alignment=ft.MainAxisAlignment.START
-                                        ),
-                                        ft.Column(
-                                            controls=[
-                                                self.note_supp_rate,
-                                                ft.Text(languages[lang]['rate > 10'], size=11, font_family='PPI',
-                                                        color='grey')
-                                            ], spacing=0
-                                        )
-                                    ], horizontal_alignment=ft.CrossAxisAlignment.CENTER
-                                )
-                            )
-                        ]
-                    ),
+                    ft.Text('Notes'.capitalize(), size=16, font_family='PPB'),
                     ft.Container(
                         bgcolor="white", padding=0, expand=True, border_radius=16,
                         content=ft.Column(
                             controls=[
                                 ft.Container(
-                                    padding=20, content=ft.Row(
+                                    padding=20, border=ft.border.all(1, "#f0f0f6"),
+                                    content=ft.Row(
                                         controls=[
                                             ft.Row(
                                                 controls=[
@@ -176,6 +104,16 @@ class Notes(ft.Container):
                                                     ColoredButton(
                                                         languages[lang]['export template'],
                                                         ft.Icons.FILE_DOWNLOAD_DONE_OUTLINED, self.open_export_xls_window
+                                                    ),
+                                                    ColoredButton(
+                                                        languages[lang]['pdf format'],
+                                                        ft.Icons.PICTURE_AS_PDF_SHARP,
+                                                        None
+                                                    ),
+                                                    ColoredButton(
+                                                        languages[lang]['xls format'],
+                                                        ft.Icons.FILE_PRESENT,
+                                                        None
                                                     )
                                                 ]
                                             ),
@@ -189,6 +127,10 @@ class Notes(ft.Container):
                                                         languages[lang]['stats by class'],
                                                         ft.Icons.AREA_CHART,
                                                         self.open_statistics_window
+                                                    ),
+                                                    MyMiniIcon(
+                                                        ft.Icons.FILTER_ALT_OFF_OUTLINED, languages[lang]['delete filter'],
+                                                        'black', None, self.supp_filters
                                                     )
                                                 ]
                                             )
@@ -198,33 +140,12 @@ class Notes(ft.Container):
                                 ft.Divider(color=ft.Colors.TRANSPARENT),
                                 ft.ListView(expand=True, controls=[self.table]),
                                 ft.Container(
-                                    padding=20,
+                                    padding=10,
                                     content=ft.Row(
                                         controls=[
-                                            ft.Row(
-                                                controls=[
-                                                    ft.Icon(
-                                                        ft.Icons.DOWNLOAD_DONE, size=20, color="black87"
-                                                    ),
-                                                    ft.Text(languages[lang]['data extraction'].upper(), size=12,
-                                                            font_family='PPB'),
-                                                ]
-                                            ),
-                                            ft.Row(
-                                                controls=[
-                                                    ColoredButton(
-                                                        languages[lang]['pdf format'],
-                                                        ft.Icons.PICTURE_AS_PDF_SHARP,
-                                                        None
-                                                    ),
-                                                    ColoredButton(
-                                                        languages[lang]['xls format'],
-                                                        ft.Icons.FILE_PRESENT,
-                                                        None
-                                                    )
-                                                ]
-                                            )
-                                        ], alignment=ft.MainAxisAlignment.SPACE_BETWEEN
+                                            self.nb_result_search,
+                                            ft.Row([self.back_bt, self.page_number, self.forward_bt])
+                                        ], alignment=ft.MainAxisAlignment.END
                                     )
                                 ),
                             ]
@@ -238,7 +159,7 @@ class Notes(ft.Container):
             elevation=50, shape=ft.RoundedRectangleBorder(radius=16),
             scale=ft.Scale(0), animate_scale=ft.Animation(300, ft.AnimationCurve.EASE_IN),
             content=ft.Container(
-                bgcolor=CT_BGCOLOR, padding=0, border_radius=16, width=450, height=450,
+                bgcolor=CT_BGCOLOR, padding=0, border_radius=16, width=500, height=430,
                 content=ft.Column(
                     controls=[
                         ft.Container(
@@ -280,12 +201,6 @@ class Notes(ft.Container):
                                             self.search_subject,
                                         ], spacing=2
                                     ),
-                                    ft.Column(
-                                        controls=[
-                                            ft.Text(languages[lang]['name'], size=11, font_family='PPM', color='grey'),
-                                            self.search_student,
-                                        ], spacing=2
-                                    ),
                                     ft.Container(
                                         padding=10, content=MyButton(
                                             languages[lang]['valid'], 'check_circle',
@@ -324,7 +239,7 @@ class Notes(ft.Container):
         )
         self.nb_students = ft.Text(size=13, font_family='PPB', visible=True)
         self.new_progress_bar = ft.ProgressBar(
-            width=100, height=15, color=BASE_COLOR, bgcolor='"f0f0f6', border_radius=16,
+            width=100, height=7, color=BASE_COLOR, bgcolor=SECOND_COLOR, border_radius=16,
             value=0
         )
         self.new_coefficient = ft.TextField(
@@ -406,30 +321,37 @@ class Notes(ft.Container):
                                                             font_family='PPB'),
                                                     ft.Row(
                                                         controls=[
-                                                            ft.Text(languages[self.lang]['total'], size=11, font_family='PPM', color='grey'),
+                                                            ft.Text(languages[self.lang]['total'].upper(), size=13, font_family='PPB', color='red'),
                                                             self.nb_students, self.no_data
                                                         ]
-                                                    )
+                                                    ),
+
                                                 ], alignment=ft.MainAxisAlignment.SPACE_BETWEEN
                                             ),
                                             ft.Divider(height=1, thickness=1)
                                         ], spacing=0
                                     ),
+
                                     self.new_table,
-                                    ft.Row(
-                                        controls=[
-                                            ft.Text(
-                                                languages[lang]['progress'], size=13, font_family='PPM',
-                                                color='grey'
-                                            ),
-                                            self.new_progress_bar
-                                        ]
-                                    ),
+
                                     ft.Container(
-                                        padding=10, content=MyButton(
-                                            languages[lang]['valid'], 'check_circle', 200,
-                                            self.valider_notes
-                                        ),
+                                        padding=10, content=ft.Row(
+                                            controls=[
+                                                MyButton(
+                                                    languages[lang]['valid'], 'check_circle', 200,
+                                                    self.valider_notes
+                                                ),
+                                                ft.Row(
+                                                    controls=[
+                                                        ft.Text(
+                                                            languages[lang]['progress'], size=13, font_family='PPM',
+                                                            color='grey'
+                                                        ),
+                                                        self.new_progress_bar
+                                                    ]
+                                                ),
+                                            ], alignment=ft.MainAxisAlignment.SPACE_BETWEEN
+                                        )
                                     )
                                 ], spacing=10,
                             )
@@ -756,16 +678,16 @@ class Notes(ft.Container):
         self.stats_class = ft.Dropdown(
             **drop_style, prefix_icon='roofing', label=languages[lang]['class'], options=[
                 ft.dropdown.Option(key=' ', text=languages[lang]['select option'])
-            ], value=' ', on_change=self.on_stats_class_change, width=200, menu_height=200
+            ], value=' ', on_change=self.on_stats_class_change, expand=True, menu_height=200
         )
         self.stats_subject = ft.Dropdown(
             **drop_style, prefix_icon='book_outlined', label=languages[lang]['subject'], options=[
                 ft.dropdown.Option(key=' ', text=languages[lang]['select option'])
-            ], value=' ', on_change=self.on_stats_subject_change, width=400, menu_height=200
+            ], value=' ', on_change=self.on_stats_subject_change, expand=True, menu_height=200
         )
         self.stats_sequence = ft.Dropdown(
             **drop_style,
-            prefix_icon=ft.Icons.BOOK_OUTLINED, width=200, menu_height=200,
+            prefix_icon=ft.Icons.BOOK_OUTLINED, expand=True, menu_height=200,
             options=[
                 ft.dropdown.Option(
                     key='sequence 1', text=f"{languages[lang]['sequence 1']}"
@@ -798,7 +720,7 @@ class Notes(ft.Container):
             elevation=50, shape=ft.RoundedRectangleBorder(radius=16),
             scale=ft.Scale(0), animate_scale=ft.Animation(300, ft.AnimationCurve.EASE_IN),
             content=ft.Container(
-                bgcolor=CT_BGCOLOR, padding=0, border_radius=16, width=450, height=500,
+                bgcolor=CT_BGCOLOR, padding=0, border_radius=16, width=450, height=700,
                 content=ft.Column(
                     controls=[
                         ft.Container(
@@ -819,21 +741,23 @@ class Notes(ft.Container):
                             bgcolor="white", padding=20, border=ft.border.only(top=ft.BorderSide(1, CT_BORDER_COLOR)),
                             border_radius=ft.border_radius.only(bottom_left=8, bottom_right=8), expand=True,
                             content=ft.Column(
-                                expand=True, spacing=10, controls=[
-                                    ft.Row([self.stats_class, self.stats_sequence]),
+                                expand=True, spacing=10, scroll=ft.ScrollMode.AUTO,
+                                controls=[
+                                    self.stats_class, self.stats_sequence,
                                     self.stats_subject,
-                                    ft.Divider(height=1, color=ft.Colors.TRANSPARENT),
+                                    ft.Divider(height=2, color=ft.Colors.TRANSPARENT),
                                     ft.Column(
                                         controls=[
                                             ft.Row(
                                                 controls=[
-                                                    ft.Text(languages[lang]['statistics'], size=13, font_family='PPB'),
-                                                    ft.Icon(ft.Icons.DATASET, size=20, color='black'),
-                                                ], alignment=ft.MainAxisAlignment.SPACE_BETWEEN
+                                                    ft.Text(languages[lang]['statistics'], size=14, font_family='PPB', color='red'),
+                                                    ft.Icon(ft.Icons.MULTILINE_CHART, size=20, color='red'),
+                                                ], alignment=ft.MainAxisAlignment.CENTER
                                             ),
                                             ft.Divider(height=1, thickness=1),
                                         ], spacing=0
                                     ),
+                                    ft.Divider(height=2, color=ft.Colors.TRANSPARENT),
                                     ft.Row(
                                         controls=[
                                             ft.Row(
@@ -847,6 +771,7 @@ class Notes(ft.Container):
                                         ], alignment=ft.MainAxisAlignment.SPACE_BETWEEN
                                     ),
                                     ft.Divider(height=1, thickness=1),
+                                    ft.Divider(height=1, color=ft.Colors.TRANSPARENT),
                                     ft.Row(
                                         controls=[
                                             ft.Row(
@@ -860,6 +785,7 @@ class Notes(ft.Container):
                                         ], alignment=ft.MainAxisAlignment.SPACE_BETWEEN
                                     ),
                                     ft.Divider(height=1, thickness=1),
+                                    ft.Divider(height=1, color=ft.Colors.TRANSPARENT),
                                     ft.Row(
                                         controls=[
                                             ft.Row(
@@ -873,6 +799,7 @@ class Notes(ft.Container):
                                         ], alignment=ft.MainAxisAlignment.SPACE_BETWEEN
                                     ),
                                     ft.Divider(height=1, thickness=1),
+                                    ft.Divider(height=1, color=ft.Colors.TRANSPARENT),
                                     ft.Row(
                                         controls=[
                                             ft.Row(
@@ -885,6 +812,7 @@ class Notes(ft.Container):
                                             self.stats_nb_boys_success
                                         ], alignment=ft.MainAxisAlignment.SPACE_BETWEEN
                                     ),
+                                    ft.Divider(height=1, color=ft.Colors.TRANSPARENT),
                                     ft.Divider(height=1, thickness=1),
                                     ft.Row(
                                         controls=[
@@ -898,7 +826,6 @@ class Notes(ft.Container):
                                             self.stats_nb_girls_success
                                         ], alignment=ft.MainAxisAlignment.SPACE_BETWEEN
                                     ),
-
                                 ]
                             )
                         )
@@ -910,11 +837,29 @@ class Notes(ft.Container):
         self.content = ft.Stack(
             expand=True,
             controls=[
-                self.main_window, self.filter_window, self.new_note_window, self.edit_note_window,
-                self.export_xls_window, self.import_window, self.statistics_window
+                ft.Column(
+                    controls=[
+                        ft.Text(languages[self.lang]['loading screen'], size=14, font_family='PPM'),
+                        ft.ProgressRing(color=BASE_COLOR)
+                    ], spacing=10,
+                    horizontal_alignment=ft.CrossAxisAlignment.CENTER,
+                    alignment=ft.MainAxisAlignment.CENTER
+                )
+
             ], alignment=ft.alignment.center
         )
         self.on_mount()
+
+    async def build_main_view(self):
+        self.content.controls.clear()
+
+        for widget in (
+                self.main_window, self.filter_window, self.new_note_window, self.edit_note_window,
+                self.export_xls_window, self.import_window, self.statistics_window
+        ):
+            self.content.controls.append(widget)
+
+        self.cp.page.update()
 
     def hide_one_window(self, window_to_hide: object):
         """
@@ -943,9 +888,9 @@ class Notes(ft.Container):
         self.cp.left_menu.disabled = True
         self.cp.top_menu.disabled = True
         self.main_window.disabled = True
-        self.cp.left_menu.opacity = 0.3
-        self.cp.top_menu.opacity = 0.3
-        self.main_window.opacity = 0.3
+        self.cp.left_menu.opacity = 0.1
+        self.cp.top_menu.opacity = 0.1
+        self.main_window.opacity = 0.1
         self.cp.page.update()
 
     @staticmethod
@@ -966,8 +911,12 @@ class Notes(ft.Container):
         self.run_async_in_thread(self.on_init_async())
 
     async def load_datas(self):
+        # Avribale à utiliser ...
+        global page_number
         access_token = self.cp.page.client_storage.get('access_token')
+        year_id = self.cp.year_id
 
+        # toutes les classes...
         details_classe = await get_all_classes_basic_info(access_token)
         for any_classe in details_classe:
             self.search_class.options.append(
@@ -976,42 +925,180 @@ class Notes(ft.Container):
                 )
             )
 
-        details_notes = await get_all_notes_with_details(access_token)
+        # Detail des notes paginées
+        page_number = 1
+        details_notes = await get_all_notes(
+            access_token=access_token, year_id=year_id, page_number=page_number
+        )
+        self.page_number.value = f"page {page_number}"
+        self.nb_result_search.value = f"Résultats de {page_number} à {page_number*100}"
+        self.back_bt.disabled = True
+
         if not details_notes:
             pass
         else:
-            nb_supp = 0
-            for detail in details_notes:
-                if detail['valeur'] >= 10:
-                    nb_supp += 1
+            self.table.rows.clear()
+            for item in details_notes:
+                self.table.rows.append(
+                    ft.DataRow(
+                        cells=[
+                            ft.DataCell(ft.Text(item['class_code'])),
+                            ft.DataCell(ft.Text(f"{item['student_name']} {item['student_surname']}".upper())),
+                            ft.DataCell(ft.Text(item['sequence'])),
+                            ft.DataCell(ft.Text(item['subject_short_name'])),
+                            ft.DataCell(ft.Text(item['value'])),
+                            ft.DataCell(
+                                ft.Row(
+                                    controls=[
+                                        MyMiniIcon(
+                                            'edit_outlined', languages[self.lang]['edit'], 'blue',
+                                            item, self.open_edit_note_window
+                                        ),
+                                        MyMiniIcon(
+                                            'delete_outlined', languages[self.lang]['delete'], 'red',
+                                            item, None
+                                        ),
+                                    ], spacing=0
+                                )
+                            )
+                        ]
+                    )
+                )
 
-            self.nb_notes.value = add_separator(len(details_notes))
-            self.nb_notes_supp.value = add_separator(nb_supp)
-            self.note_supp_rate.value = f"{(nb_supp * 100 / len(details_notes)):.2f}%"
 
-        self.cp.page.update()
+        await self.build_main_view()
+
+    async def load_click_forward(self, e):
+        # Avribale à utiliser ...
+        global page_number
+        access_token = self.cp.page.client_storage.get('access_token')
+        year_id = self.cp.year_id
+        page_number += 1
+        self.forward_bt.disabled = False
+
+        details_notes = await get_all_notes(
+            access_token=access_token, year_id=year_id, page_number=page_number
+        )
+        self.page_number.value = f"page {page_number}"
+        step = 100
+        start = (page_number - 1) * 100 + 1
+        end = start + step - 1
+        self.nb_result_search.value = f"Résultats de {start} à {end}"
+        self.back_bt.disabled = True
+
+        if not details_notes:
+            pass
+        else:
+            self.table.rows.clear()
+            for item in details_notes:
+                self.table.rows.append(
+                    ft.DataRow(
+                        cells=[
+                            ft.DataCell(ft.Text(item['class_code'])),
+                            ft.DataCell(ft.Text(f"{item['student_name']} {item['student_surname']}".upper())),
+                            ft.DataCell(ft.Text(item['sequence'])),
+                            ft.DataCell(ft.Text(item['subject_short_name'])),
+                            ft.DataCell(ft.Text(item['value'])),
+                            ft.DataCell(
+                                ft.Row(
+                                    controls=[
+                                        MyMiniIcon(
+                                            'edit_outlined', languages[self.lang]['edit'], 'blue',
+                                            item, self.open_edit_note_window
+                                        ),
+                                        MyMiniIcon(
+                                            'delete_outlined', languages[self.lang]['delete'], 'red',
+                                            item, None
+                                        ),
+                                    ], spacing=0
+                                )
+                            )
+                        ]
+                    )
+                )
+
+            self.back_bt.disabled = False
+            self.cp.page.update()
+
+    def click_forward(self, e):
+        self.run_async_in_thread(self.load_click_forward(e))
+
+    async def load_click_back(self, e):
+        # Avribale à utiliser ...
+        global page_number
+        page_number -= 1
+        access_token = self.cp.page.client_storage.get('access_token')
+        year_id = self.cp.year_id
+
+        details_notes = await get_all_notes(
+            access_token=access_token, year_id=year_id, page_number=page_number
+        )
+        self.page_number.value = f"page {page_number}"
+        step = 100
+        start = (page_number - 1) * 100 + 1
+        end = start + step - 1
+        self.nb_result_search.value = f"Résultats de {start} à {end}"
+        self.back_bt.disabled = True
+
+        if not details_notes:
+            pass
+        else:
+            self.table.rows.clear()
+            for item in details_notes:
+                self.table.rows.append(
+                    ft.DataRow(
+                        cells=[
+                            ft.DataCell(ft.Text(item['class_code'])),
+                            ft.DataCell(ft.Text(f"{item['student_name']} {item['student_surname']}".upper())),
+                            ft.DataCell(ft.Text(item['sequence'])),
+                            ft.DataCell(ft.Text(item['subject_short_name'])),
+                            ft.DataCell(ft.Text(item['value'])),
+                            ft.DataCell(
+                                ft.Row(
+                                    controls=[
+                                        MyMiniIcon(
+                                            'edit_outlined', languages[self.lang]['edit'], 'blue',
+                                            item, self.open_edit_note_window
+                                        ),
+                                        MyMiniIcon(
+                                            'delete_outlined', languages[self.lang]['delete'], 'red',
+                                            item, None
+                                        ),
+                                    ], spacing=0
+                                )
+                            )
+                        ]
+                    )
+                )
+
+            if page_number == 1:
+                self.back_bt.disabled = True
+            else:
+                self.back_bt.disabled = False
+
+            self.cp.page.update()
+
+    def click_back(self, e):
+        self.run_async_in_thread(self.load_click_back(e))
 
     async def filter_datas(self, e):
         access_token = self.cp.page.client_storage.get('access_token')
-        details_notes = await get_all_notes_with_details(access_token)
+        year_id = self.cp.year_id
 
-        if not details_notes:
-            pass
+        my_class = self.search_class.value
+        my_subject = self.search_subject.value
+        my_sequence = self.search_sequence.value
+
+        if not my_class or not my_sequence or not my_subject:
+            self.cp.box.title.value = languages[self.lang]['error']
+            self.cp.box.content.value = languages[self.lang]['error msg']
+            self.cp.box.open = True
+            self.cp.box.update()
+
         else:
-            my_class = self.search_class.value if self.search_class.value != ' ' else ''
-            my_subject = self.search_subject.value if self.search_subject.value != ' ' else ''
-            my_sequence = self.search_sequence.value if self.search_sequence.value != ' ' else ''
-            my_name = self.search_student.value if self.search_student.value else ''
-
-            filtered_datas = list(
-                filter(
-                    lambda x: my_class in x['class_id'] and my_subject in x['subject_id']
-                    and my_sequence in x['sequence'] and my_name in x['student_name'],
-                    details_notes
-                )
+            filtered_datas = await get_all_notes_with_details(
+                access_token, year_id, my_subject, my_class, my_sequence
             )
-            for data in filtered_datas:
-                print(data)
 
             if not filtered_datas:
                 self.cp.box.title.value = languages[self.lang]['error']
@@ -1028,7 +1115,7 @@ class Notes(ft.Container):
                                 ft.DataCell(ft.Text(f"{item['student_name']} {item['student_surname']}".upper())),
                                 ft.DataCell(ft.Text(item['sequence'])),
                                 ft.DataCell(ft.Text(item['subject_short_name'])),
-                                ft.DataCell(ft.Text(item['valeur'])),
+                                ft.DataCell(ft.Text(item['value'])),
                                 ft.DataCell(
                                     ft.Row(
                                         controls=[
@@ -1047,10 +1134,19 @@ class Notes(ft.Container):
                         )
                     )
 
+                self.page_number.value = f"page 1"
+
+                self.nb_result_search.value = f"Résultats de 1 à {len(filtered_datas)}"
+                self.back_bt.disabled = True
+                self.forward_bt.disabled = True
+
                 self.cp.page.update()
 
     def valid_filters(self, e):
         self.run_async_in_thread(self.filter_datas(e))
+
+    def supp_filters(self, e):
+        self.run_async_in_thread(self.load_datas())
 
     async def load_subject_filter(self, e):
         access_token = self.cp.page.client_storage.get('access_token')
